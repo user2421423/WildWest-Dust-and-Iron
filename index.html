@@ -110,7 +110,7 @@ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl
 let im=new Image();im.onload=()=>{gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
 gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.generateMipmap(gl.TEXTURE_2D);
 if(gl.getExtension('EXT_texture_filter_anisotropic')){let ext=gl.getExtension('EXT_texture_filter_anisotropic');gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,8);}};
-im.onerror=()=>console.warn('PBR image unavailable');im.src=uri;return t;}
+im.onerror=()=>console.warn('PBR image unavailable',uri);if(location.hostname==='htmlpreview.github.io'&&uri.startsWith('assets/')){im.crossOrigin='anonymous';uri='https://raw.githubusercontent.com/user2421423/WildWest-Dust-and-Iron/main/'+uri;}im.src=uri;return t;}
 const textures={},normalMaps={};for(let [name,texture] of Object.entries(PBR_ASSETS)){textures[name]=imageTexture(texture.albedo);normalMaps[name]=imageTexture(texture.normal,true);}
 const flatNormal=glTex((()=>{let c=document.createElement('canvas');c.width=2;c.height=2;let x=c.getContext('2d');x.fillStyle='rgba(128,128,255,0.85)';x.fillRect(0,0,2,2);return c;})());
 
