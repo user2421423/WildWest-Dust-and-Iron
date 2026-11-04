@@ -2,6 +2,10 @@
 
 A standalone, browser-playable 3D Wild West quickdraw game. Challenge five gunslingers outside a frontier saloon, with first-person and over-the-shoulder third-person views.
 
+## Play online
+
+[**Play DUST & IRON in your browser**](https://htmlpreview.github.io/?https://github.com/user2421423/WildWest-Dust-and-Iron/blob/main/index.html) — requires Chrome or another browser with WebGL2 graphics support.
+
 ## Play
 
 Open [`index.html`](index.html) locally in a modern WebGL2-capable browser (Chrome recommended), or use the repository's GitHub Pages site after enabling Pages.
