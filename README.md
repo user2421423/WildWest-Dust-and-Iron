@@ -49,3 +49,8 @@ In GitHub, open **Settings → Pages → Build and deployment**, choose **Deploy
 ## Attribution and usage
 
 The game was generated for a user project. No open-source license is specified in this repository; do not assume permission to redistribute or relicense it beyond the repository owner's rights.
+## Online play
+
+For public preview, enable GitHub Pages in **Settings → Pages**, select **Deploy from a branch**, branch `main`, folder `/ (root)`. Then open `https://user2421423.github.io/WildWest-Dust-and-Iron/`.
+
+On GitHub Pages the textures load from the `assets/` folder. For offline play without a local server, use the original standalone HTML file, which includes all textures inline.

@@ -1,0 +1,623 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/><title>DUST & IRON — FRONTIER CINEMATIC | Offline 3D Quickdraw</title><style>
+:root{--gold:#e5c58b;--line:rgba(236,192,121,.37);--paper:#e8d7ba;--night:#100d0c;--blood:#bd4c39}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:#120d0b;overflow:hidden;color:var(--paper);font-family:Georgia,serif;user-select:none}button{cursor:pointer;font-family:inherit}#scene{width:100%;height:100%;position:fixed;inset:0;display:block;touch-action:none;outline:0}
+#vignette{position:fixed;inset:0;pointer-events:none;background:radial-gradient(ellipse at 52% 43%,transparent 40%,rgba(20,10,10,.20) 69%,rgba(10,5,5,.75) 100%);mix-blend-mode:multiply;z-index:2}#grain{position:fixed;inset:0;pointer-events:none;z-index:3;opacity:.16;background-image:url('data:image/svg+xml,%3Csvg viewBox=%220 0 180 180%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%22.75%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22/%3E%3C/svg%3E');mix-blend-mode:soft-light}#bars::before,#bars::after{content:"";position:fixed;left:0;right:0;height:3.2vh;background:#080706;z-index:4;pointer-events:none}#bars::before{top:0}#bars::after{bottom:0}
+#flash{position:fixed;inset:0;background:#fbe9ad;z-index:5;pointer-events:none;opacity:0;transition:opacity .16s}#blood{position:fixed;inset:0;z-index:5;pointer-events:none;opacity:0;background:radial-gradient(ellipse at center,transparent 35%,rgba(150,8,8,.55) 100%);transition:opacity .45s}
+#hud{position:fixed;inset:0;z-index:6;pointer-events:none;transition:opacity .3s}#hud.hidden{opacity:0}#hud button{pointer-events:auto}.topbar{position:absolute;left:4.2%;right:4.2%;top:6%;display:flex;justify-content:space-between;align-items:flex-start;gap:12px}.brand{font-family:Georgia,serif;letter-spacing:.15em;font-size:clamp(15px,2vw,23px);color:#f1d19b;font-weight:bold}.brand em{font-style:normal;color:#a6432c}.micro{margin-top:6px;font:9px Arial,sans-serif;letter-spacing:.25em;text-transform:uppercase;color:#d6b48e}.topBtns{display:flex;gap:8px}.topBtns button{border:1px solid var(--line);background:rgba(27,17,12,.7);color:#ead2aa;padding:11px 14px;font:10px Arial,sans-serif;letter-spacing:.16em;backdrop-filter:blur(8px);transition:.18s}.topBtns button:hover{background:rgba(120,75,34,.7);border-color:#e6c48e}
+.chapter{position:absolute;top:16%;left:4.2%;font:10px Arial,sans-serif;letter-spacing:.25em;color:#e0c198;text-shadow:0 1px 12px black}.chapter strong{display:block;margin-top:8px;font:normal clamp(19px,2.4vw,32px) Georgia,serif;letter-spacing:.03em;color:#fff1d1}.villain{position:absolute;top:16%;right:4.2%;text-align:right;font:10px Arial,sans-serif;letter-spacing:.22em;color:#d7c39f;text-shadow:0 1px 12px black}.villain strong{display:block;margin-top:8px;font:normal clamp(18px,2.4vw,32px) Georgia,serif;letter-spacing:.03em;color:#fff0cb}.villain .price{font-size:11px;color:#e8bd76;margin-top:7px}
+#reticle{position:absolute;left:50%;top:52%;width:34px;height:34px;transform:translate(-50%,-50%);opacity:0;transition:opacity .15s}#reticle::before,#reticle::after{content:"";position:absolute;background:#f6e4c4;box-shadow:0 1px 5px #25120c}#reticle::before{height:1px;width:36px;left:-1px;top:16px}#reticle::after{width:1px;height:36px;top:-1px;left:16px}#reticle i{position:absolute;left:10px;top:10px;width:14px;height:14px;border:1px solid #f6d3a0;border-radius:50%;box-shadow:0 0 8px #b75d2a}#reticle.live{opacity:1}#reticle.hot i{border-color:#d72f26;box-shadow:0 0 18px #ce2816}
+#banner{position:absolute;top:29%;left:0;right:0;text-align:center;text-shadow:0 3px 24px #241209;transition:opacity .25s,transform .3s;opacity:0;transform:translateY(10px)}#banner.shown{opacity:1;transform:translateY(0)}#banner .pre{font:10px Arial,sans-serif;letter-spacing:.65em;color:#f6d4a5}#banner .main{font:700 clamp(58px,10vw,154px)/1.05 Georgia,serif;letter-spacing:-.025em;color:#fce2a3}#banner .sub{font:10px Arial,sans-serif;letter-spacing:.35em;color:#f4dcb3}
+.footer{position:absolute;left:4.2%;right:4.2%;bottom:8%;display:flex;align-items:flex-end;justify-content:space-between;gap:12px;font:10px/1.9 Arial,sans-serif;letter-spacing:.13em;color:#e0c6a2;text-shadow:0 2px 9px #21100c}.footer strong{font-size:11px;color:#fff1d1;letter-spacing:.21em}.score{font:10px Arial,sans-serif;text-align:right;letter-spacing:.2em}.score strong{display:block;font:28px Georgia,serif;letter-spacing:.03em;margin-top:4px}
+#intro{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:4vw;background:linear-gradient(90deg,rgba(13,9,8,.92),rgba(21,14,11,.77) 50%,rgba(25,14,10,.18));transition:opacity .3s,visibility .3s}#intro.hidden{opacity:0;visibility:hidden;pointer-events:none}.intro-inner{width:min(1100px,95vw);display:grid;grid-template-columns:1fr .65fr;gap:8%;align-items:center}.eyebrow{font:11px Arial,sans-serif;letter-spacing:.38em;color:#e0b477}.title{font:normal clamp(75px,11.5vw,157px)/.83 Georgia,serif;letter-spacing:-.074em;color:#fff0c8;margin:27px 0 0;text-shadow:0 6px 22px #110807}.title span{display:block;color:#c46d4c}.sep{height:1px;width:245px;margin:35px 0;background:linear-gradient(90deg,#e3ad71,transparent)}.intro-copy{font:clamp(15px,1.52vw,19px)/1.7 Georgia,serif;max-width:550px;color:#f0dec1}.intro-actions{display:flex;align-items:center;gap:20px;margin-top:33px;flex-wrap:wrap}.goldBtn{padding:17px 26px;border:1px solid #efc88f;background:linear-gradient(135deg,#f1cc87,#b5834b);color:#26190f;font:bold 11px Arial,sans-serif;letter-spacing:.2em;box-shadow:0 5px 0 #6a4125,0 12px 30px #100a07;transition:filter .2s,transform .2s}.goldBtn:hover{filter:brightness(1.18);transform:translateY(-2px)}.darkBtn{border:0;border-bottom:1px solid #ad8860;padding:11px 2px;background:transparent;color:#f0d3aa;font:11px Arial,sans-serif;letter-spacing:.16em}.legal{margin-top:37px;font:10px/2.1 Arial,sans-serif;letter-spacing:.12em;color:#c6ab88}.poster{width:min(300px,100%);min-height:420px;justify-self:center;padding:23px;background:#c6a574;border:7px solid #a98350;outline:1px solid #3b2819;box-shadow:0 17px 65px rgba(0,0,0,.7),inset 0 0 46px rgba(80,43,19,.45);text-align:center;color:#322015;transform:rotate(4deg)}.poster .wanted{font:bold 45px Georgia,serif}.poster .alive{font:13px Arial,sans-serif;letter-spacing:.27em;margin-top:3px}.poster .picture{height:190px;overflow:hidden;margin:14px 0;border-top:3px double #5c402a;border-bottom:3px double #5c402a;background:radial-gradient(ellipse,#cdb18a,#94724b);display:flex;align-items:center;justify-content:center}.poster svg{height:185px;width:200px;opacity:.80;filter:sepia(1)}.poster .money{font:bold 16px Georgia,serif;margin-top:8px}.poster .amount{font:bold 38px Georgia,serif;margin-top:5px}.poster .small{font:8px/1.6 Arial,sans-serif;letter-spacing:.16em;margin-top:13px}
+#result{position:fixed;z-index:11;left:50%;bottom:9%;transform:translate(-50%,35px);width:min(730px,94vw);padding:26px 35px 30px;text-align:center;background:linear-gradient(130deg,rgba(24,16,12,.93),rgba(43,26,17,.89));border:1px solid #8f6d4b;box-shadow:0 16px 50px #0d0908;backdrop-filter:blur(16px);opacity:0;visibility:hidden;pointer-events:none;transition:.35s}#result.shown{opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0)}.result-pre{font:10px Arial,sans-serif;letter-spacing:.35em;color:#dab482}.result-head{font:normal clamp(32px,5.5vw,68px) Georgia,serif;color:#f5dbac;margin:9px 0}.result-desc{font:14px Georgia,serif;color:#d9c3a4}.stats{margin:19px auto 23px;display:flex;justify-content:center;gap:clamp(18px,5vw,75px)}.stat{font:9px Arial,sans-serif;letter-spacing:.19em;color:#bfa17c;text-align:center}.stat strong{display:block;margin-top:8px;font:24px Georgia,serif;color:#f8dfaf;letter-spacing:0}.result-actions{display:flex;gap:20px;justify-content:center;align-items:center}
+#pause{position:fixed;z-index:12;inset:0;display:none;place-items:center;background:rgba(14,8,8,.7);backdrop-filter:blur(9px);text-align:center}#pause.show{display:grid}.pause-head{font:normal 52px Georgia,serif;color:#f0d6a6}.pause-sub{font:10px Arial,sans-serif;color:#d8b98b;letter-spacing:.25em;margin:10px 0 25px}#error{display:none;position:fixed;inset:0;z-index:30;align-items:center;justify-content:center;background:#150d0a;padding:25px;text-align:center;color:#f5dbb1;font:17px/1.6 Georgia,serif}
+#loading{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;background:#140e0b;color:#e5c08a;font:12px Arial,sans-serif;letter-spacing:.3em;transition:opacity .35s}#loading.hidden{opacity:0;pointer-events:none}
+@media(max-width:730px){.intro-inner{display:block}.poster{display:none}.title{font-size:clamp(70px,14vw,110px)}.topBtns button{font-size:9px;padding:8px}.topbar{top:6%}.chapter,.villain{top:14%}.brand{font-size:15px}.micro{font-size:7px}.result-head{font-size:35px}.footer{font-size:8px}.footer strong{font-size:9px}.score strong{font-size:20px}}
+#rayGlow{position:fixed;inset:0;pointer-events:none;z-index:1;background:radial-gradient(ellipse 18% 23% at 77% 35%,rgba(255,183,107,.11),transparent 90%);mix-blend-mode:screen}
+.topBtns button{white-space:nowrap}#qualityBtn{color:#eac58e;border-color:rgba(223,177,91,.55)}
+@media(max-width:650px){#qualityBtn{display:none}.topBtns{gap:4px}}
+</style></head><body>
+<canvas id="scene" aria-label="Full 3D quickdraw duel outside a western saloon"></canvas><div id="rayGlow"></div><div id="vignette"></div><div id="grain"></div><div id="bars"></div><div id="flash"></div><div id="blood"></div>
+<div id="hud" class="hidden"><div class="topbar"><div><div class="brand">DUST <em>&</em> IRON</div><div class="micro">HIGH NOON · CINEMATIC 3D EDITION</div></div><div class="topBtns"><button id="cameraBtn">◈ THIRD PERSON</button><button id="soundBtn">♫ SOUND ON</button><button id="qualityBtn" title="Change graphics quality">✦ ULTRA</button><button id="pauseBtn">Ⅱ PAUSE</button></div></div><div class="chapter">DUEL <strong id="roundText">01 / 05</strong></div><div class="villain">YOUR OPPONENT <strong id="enemyText">COYOTE JACK</strong><div class="price" id="rewardText">$ 150 REWARD</div></div><div id="banner"><div class="pre" id="bannerPre">HOLD YOUR NERVE</div><div class="main" id="bannerMain">DRAW!</div><div class="sub" id="bannerSub">ONE SHOT. ONE CHANCE.</div></div><div id="reticle"><i></i></div><div class="footer"><div><strong id="hintTitle">KEEP YOUR HAND AWAY FROM THE IRON</strong><div id="hintText">MOVE MOUSE TO AIM · CLICK TO FIRE · V TO CHANGE VIEW</div></div><div class="score">TOTAL BOUNTY<strong id="scoreText">$0</strong></div></div></div>
+<div id="intro"><div class="intro-inner"><div><div class="eyebrow">A 3D CINEMATIC QUICKDRAW WESTERN</div><h1 class="title">DUST <span>& IRON</span></h1><div class="sep"></div><div class="intro-copy">Five notorious gunslingers. One lawless frontier. Meet them outside the saloon, stare them down, and draw only when the bell tolls.</div><div class="intro-actions"><button class="goldBtn" id="startBtn">RIDE INTO TOWN &nbsp; →</button><button class="darkBtn" id="howBtn">HOW TO DUEL ↗</button></div><div class="legal">TRUE 3D WEBGL2 · REAL-TIME LIGHTING & SHADOWS<br>FIRST / THIRD PERSON · 5 DUELS · STEREO SOUND<br>NO ACCOUNT OR INSTALLATION REQUIRED</div></div><div class="poster"><div class="wanted">WANTED</div><div class="alive">DEAD OR ALIVE</div><div class="picture"><svg viewBox="0 0 200 185"><path d="M18 185 Q20 120 63 115 L138 115 Q185 125 186 185" fill="#56402d"/><path d="M64 117 Q100 154 136 117 L140 185H58Z" fill="#ab8b62"/><path d="M77 76 Q75 105 91 122L111 122Q130 105 125 78" fill="#896946"/><path d="M72 55 Q69 77 80 98 Q101 115 122 97 L131 55" fill="#98744d" stroke="#4e3a2a" stroke-width="3"/><path d="M63 71 Q103 88 138 70 L139 61Q119 51 127 14H77Q78 49 64 61Z" fill="#37251d"/><ellipse cx="101" cy="69" rx="75" ry="12" fill="#38231a"/><path d="M79 83l14 0M109 83h13" stroke="#34241d" stroke-width="4"/><path d="M89 100Q102 89 113 100M87 101Q100 109 116 99" stroke="#38261f" stroke-width="5"/></svg></div><div class="money">REWARD</div><div class="amount">$ 2,500</div><div class="small">FOR THE OUTLAWS OF<br>RED ROCK COUNTY</div></div></div></div>
+<div id="result"><div class="result-pre" id="resultPre">DUEL COMPLETE</div><div class="result-head" id="resultTitle">THE FASTEST GUN</div><div class="result-desc" id="resultDesc">The sun sets on another outlaw.</div><div class="stats"><div class="stat">DRAW TIME<strong id="timeStat">0.000s</strong></div><div class="stat">SHOT<strong id="shotStat">BODY</strong></div><div class="stat">BOUNTY<strong id="bountyStat">+$150</strong></div></div><div class="result-actions"><button class="goldBtn" id="nextBtn">NEXT DUEL →</button><button class="darkBtn" id="retryBtn">RETRY ↻</button></div></div><div id="pause"><div><div class="pause-head">HOLD YOUR FIRE</div><div class="pause-sub">THE TOWN HOLDS ITS BREATH</div><button class="goldBtn" id="resumeBtn">RESUME DUEL →</button></div></div><div id="loading">RIDING INTO RED ROCK COUNTY …</div><div id="error"></div>
+<script>
+// DUST & IRON FRONTIER CINEMATIC — WebGL2 PBR, procedural character sculpting, articulated rigs and filmic post FX sleeve rigs.
+'use strict';
+const $=s=>document.getElementById(s),canvas=$('scene');
+const gl=canvas.getContext('webgl2',{antialias:true,alpha:false,depth:true,stencil:false,preserveDrawingBuffer:false,powerPreference:'high-performance'});
+if(!gl){$('loading').style.display='none';$('error').style.display='flex';$('error').textContent='This game needs WebGL2. Enable hardware graphics acceleration in Chrome or try another browser.';throw Error('WebGL2 not available');}
+const T={};const PI=Math.PI,TAU=2*PI,clamp=(x,a,b)=>Math.max(a,Math.min(b,x)),lerp=(a,b,t)=>a+(b-a)*t,smooth=t=>t*t*(3-2*t),rand=(a,b)=>a+Math.random()*(b-a);
+function rng(seed){return()=>{seed|=0;seed=(seed+0x6D2B79F5)|0;let t=Math.imul(seed^(seed>>>15),1|seed);t^=t+Math.imul(t^(t>>>7),61|t);return((t^(t>>>14))>>>0)/4294967296;};}let random=rng(4081);
+function ident(){return new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);}
+function mul(a,b){let r=new Float32Array(16);for(let c=0;c<4;c++)for(let row=0;row<4;row++)r[c*4+row]=a[row]*b[c*4]+a[row+4]*b[c*4+1]+a[row+8]*b[c*4+2]+a[row+12]*b[c*4+3];return r;}
+function translate(x=0,y=0,z=0){let a=ident();a[12]=x;a[13]=y;a[14]=z;return a;}
+function scale(x=1,y=1,z=1){let a=ident();a[0]=x;a[5]=y;a[10]=z;return a;}
+function rx(t){let a=ident(),c=Math.cos(t),s=Math.sin(t);a[5]=c;a[6]=s;a[9]=-s;a[10]=c;return a;}
+function ry(t){let a=ident(),c=Math.cos(t),s=Math.sin(t);a[0]=c;a[2]=-s;a[8]=s;a[10]=c;return a;}
+function rz(t){let a=ident(),c=Math.cos(t),s=Math.sin(t);a[0]=c;a[1]=s;a[4]=-s;a[5]=c;return a;}
+function compose(...m){return m.reduce((a,b)=>mul(a,b),ident());}
+function tx(m,p){return [m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12],m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13],m[2]*p[0]+m[6]*p[1]+m[10]*p[2]+m[14]];}
+function norm(p){let l=Math.hypot(...p)||1;return p.map(x=>x/l);}function sub(a,b){return a.map((x,i)=>x-b[i]);}function add(a,b){return a.map((x,i)=>x+b[i]);}function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function perspective(fov,aspect,near,far){let f=1/Math.tan(fov/2),a=new Float32Array(16);a[0]=f/aspect;a[5]=f;a[10]=(far+near)/(near-far);a[11]=-1;a[14]=2*far*near/(near-far);return a;}
+function ortho(l,r,b,t,n,f){let a=ident();a[0]=2/(r-l);a[5]=2/(t-b);a[10]=-2/(f-n);a[12]=-(r+l)/(r-l);a[13]=-(t+b)/(t-b);a[14]=-(f+n)/(f-n);return a;}
+function lookAt(eye,target,up=[0,1,0]){let z=norm(sub(eye,target)),x=norm(cross(up,z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,eye),-dot(y,eye),-dot(z,eye),1]);}
+function compile(type,src){let s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw Error('Shader: '+gl.getShaderInfoLog(s));return s;}
+function program(vs,fs){let p=gl.createProgram();gl.attachShader(p,compile(gl.VERTEX_SHADER,vs));gl.attachShader(p,compile(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw Error('Shader link: '+gl.getProgramInfoLog(p));return p;}
+const sceneVS=`#version 300 es
+precision highp float;
+layout(location=0) in vec3 aPosition;layout(location=1) in vec3 aNormal;layout(location=2) in vec2 aUV;layout(location=3) in vec3 aTint;layout(location=4) in vec4 aBone;layout(location=5) in vec4 aWeight;
+uniform mat4 uModel,uViewProj,uSunViewProj,uBones[8];uniform bool uSkin;
+out vec3 vNormal,vWorld,vTint;out vec2 vUV;out vec4 vShadow;
+void main(){vec4 p=vec4(aPosition,1.0);vec3 n=aNormal;if(uSkin){mat4 sk=uBones[int(aBone.x)]*aWeight.x+uBones[int(aBone.y)]*aWeight.y+uBones[int(aBone.z)]*aWeight.z+uBones[int(aBone.w)]*aWeight.w;p=sk*p;n=mat3(sk)*n;}vec4 w=uModel*p;vWorld=w.xyz;vNormal=normalize(mat3(uModel)*n);vTint=aTint;vUV=aUV;vShadow=uSunViewProj*w;gl_Position=uViewProj*w;}`;
+const sceneFS=`#version 300 es
+precision highp float;
+precision highp sampler2DShadow;
+in vec3 vNormal,vWorld,vTint;in vec2 vUV;in vec4 vShadow;
+uniform sampler2D uTex,uNormalRough;uniform sampler2DShadow uShadow;uniform bool uWorldUV;uniform vec3 uCamera,uSunDir,uFogColor,uTint;uniform float uMetalness,uRoughness,uLight,uFogDensity,uTime;uniform bool uShadowEnabled;
+out vec4 fragColor;
+const float PI=3.14159265;
+float distributionGGX(vec3 N,vec3 H,float a){float a2=a*a;float NoH=max(dot(N,H),0.0);float d=NoH*NoH*(a2-1.0)+1.0;return a2/max(PI*d*d,.00001);}
+float geometrySchlick(float NoV,float k){return NoV/(NoV*(1.-k)+k);}float geometrySmith(vec3 N,vec3 V,vec3 L,float r){float k=(r+1.);k=k*k/8.;return geometrySchlick(max(dot(N,V),.0),k)*geometrySchlick(max(dot(N,L),.0),k);}
+vec3 fresnel(float HdotV,vec3 F0){return F0+(1.-F0)*pow(1.-HdotV,5.);}
+mat3 cotangentFrame(vec3 N,vec3 p,vec2 uv){vec3 dp1=dFdx(p),dp2=dFdy(p);vec2 duv1=dFdx(uv),duv2=dFdy(uv);
+vec3 dp2perp=cross(dp2,N),dp1perp=cross(N,dp1);vec3 T=dp2perp*duv1.x+dp1perp*duv2.x;vec3 B=dp2perp*duv1.y+dp1perp*duv2.y;float invmax=inversesqrt(max(dot(T,T),dot(B,B))+.00001);return mat3(T*invmax,B*invmax,N);}
+float shadow(){if(!uShadowEnabled)return 1.;vec3 coord=vShadow.xyz/vShadow.w;coord=coord*.5+.5;if(coord.x<0.||coord.x>1.||coord.y<0.||coord.y>1.||coord.z>1.)return 1.;vec3 N=normalize(vNormal);float b=max(.00065,.0025*(1.-dot(N,normalize(uSunDir))));float res=0.;for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++)res+=texture(uShadow,vec3(coord.xy+vec2(float(x),float(y))*.00079,coord.z-b));return mix(.40,1.,res/9.);}
+vec3 tonemap(vec3 c){c=(c*(2.51*c+.03))/(c*(2.43*c+.59)+.14);return clamp(c,0.,1.);}
+void main(){vec2 mappedUV=uWorldUV?vWorld.xz*.19:vUV;vec4 tex=texture(uTex,mappedUV);vec4 packed=texture(uNormalRough,mappedUV);
+vec3 albedo=pow(max(tex.rgb*uTint*vTint,vec3(.001)),vec3(2.2));vec3 geomN=normalize(vNormal);
+vec3 mapN=normalize(packed.xyz*2.-1.);vec3 N=normalize(cotangentFrame(geomN,vWorld,mappedUV)*mix(vec3(0.,0.,1.),mapN,.73));
+N=normalize(mix(geomN,N,.78));vec3 V=normalize(uCamera-vWorld);vec3 L=normalize(uSunDir);vec3 H=normalize(V+L);float NoL=max(dot(N,L),0.),NoV=max(dot(N,V),.001),NoH=max(dot(N,H),0.),HdotV=max(dot(H,V),0.);float r=clamp(mix(uRoughness,packed.a,.48),.065,1.),a=r*r;vec3 F0=mix(vec3(.035),albedo,uMetalness);vec3 F=fresnel(HdotV,F0);float D=distributionGGX(N,H,a),G=geometrySmith(N,V,L,r);vec3 spec=D*G*F/(4.*NoV*NoL+.0001);vec3 diffuse=(1.-F)*(1.-uMetalness)*albedo/PI;float sh=shadow();vec3 sun=vec3(3.2,2.18,1.48)*NoL*sh*(diffuse+spec);vec3 bounce=vec3(.24,.29,.38)*(.56+.44*max(N.y,0.))+vec3(.24,.12,.065)*(.32+.24*max(-N.y,0.));vec3 amb=albedo*bounce*(1.-uMetalness*.85);vec3 reflectDir=reflect(-V,N);float skyHighlight=pow(max(dot(normalize(reflectDir),normalize(vec3(.62,.72,-.5))),0.),5.);
+vec3 envReflect=F0*(vec3(.08,.105,.15)*(1.-max(reflectDir.y,0.)) + vec3(.27,.18,.11)*max(reflectDir.y,0.)+vec3(.24,.17,.11)*skyHighlight)*(1.-r*.65);
+vec3 metalAmb=F0*vec3(.055,.062,.083)+envReflect;
+vec3 lantern=vec3(0.0);for(int i=0;i<4;i++){vec3 lp=i==0?vec3(-7.45,2.59,3.0):i==1?vec3(-7.45,2.59,5.0):i==2?vec3(7.43,2.55,-4.4):vec3(7.43,2.55,-6.3);vec3 diff=lp-vWorld;float dist=length(diff);vec3 dir=diff/max(dist,.001);float fall=2.1/(1.+.55*dist*dist);lantern+=(albedo*.8+F0*.10)*vec3(1.0,.57,.22)*max(dot(N,dir),0.)*fall;}
+float microAO=clamp(.95-(1.-packed.a)*.10-.10*length(fwidth(N)),.53,1.);
+vec3 color=(sun+amb*microAO+metalAmb+lantern)*uLight;float d=length(uCamera-vWorld);float fog=1.-exp(-pow(d*uFogDensity,1.22));color=mix(color,pow(uFogColor,vec3(2.2))*.73,clamp(fog,0.,.89));color=tonemap(color);color=pow(color,vec3(1./2.2));color=mix(color,vec3(dot(color,vec3(.24,.66,.1))),.065);fragColor=vec4(color,tex.a);}`;
+const shadowVS=`#version 300 es
+precision highp float;layout(location=0) in vec3 aPosition;layout(location=4) in vec4 aBone;layout(location=5) in vec4 aWeight;
+uniform mat4 uModel,uSunViewProj,uBones[8];uniform bool uSkin;
+void main(){vec4 p=vec4(aPosition,1.);if(uSkin){mat4 sk=uBones[int(aBone.x)]*aWeight.x+uBones[int(aBone.y)]*aWeight.y+uBones[int(aBone.z)]*aWeight.z+uBones[int(aBone.w)]*aWeight.w;p=sk*p;}gl_Position=uSunViewProj*uModel*p;}`;
+const shadowFS=`#version 300 es
+precision highp float;void main(){}`;
+const skyVS=`#version 300 es
+precision highp float;out vec2 uv;void main(){vec2 pos=vec2((gl_VertexID==2)?3.:-1.,(gl_VertexID==1)?3.:-1.);gl_Position=vec4(pos,0.,1.);uv=pos*.5+.5;}`;
+const skyFS=`#version 300 es
+precision highp float;in vec2 uv;out vec4 outColor;uniform float uTime,uAspect;uniform vec3 uSkyTop,uSkyLow;float hash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}float noise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(hash(i),hash(i+vec2(1,0)),f.x),mix(hash(i+vec2(0,1)),hash(i+vec2(1)),f.x),f.y);}void main(){vec2 p=uv;float horizon=.46;float f=clamp((p.y-horizon)*1.8+.32,0.,1.);vec3 sky=mix(uSkyLow,uSkyTop,smoothstep(.05,1.1,f));float low=1.-smoothstep(.08,.54,abs(p.y-horizon));sky+=vec3(.22,.115,.055)*low;vec2 sun=vec2(.765,.62);float d=length((p-sun)*vec2(uAspect*.8,1.));float glow=exp(-d*5.3)*.31+exp(-d*29.)*.30;sky+=vec3(1.0,.58,.27)*glow;float disk=1.-smoothstep(.014,.019,d);sky=mix(sky,vec3(1.,.84,.57),disk*.95);vec2 q=vec2(p.x*4.5+uTime*.002,p.y*14.);float n=noise(q)*.5+noise(q*2.3)*.28+noise(q*5.)*.12;float cloud=smoothstep(.54,.69,n+.10*sin(p.x*8.))*smoothstep(.48,.60,p.y)*(1.-smoothstep(.86,1.,p.y));sky=mix(sky,sky*vec3(.60,.61,.71)+vec3(.23,.17,.14),cloud*.65);outColor=vec4(pow(clamp(sky,0.,1.),vec3(.84)),1.);}`;
+const particleVS=`#version 300 es
+precision highp float;layout(location=0) in vec3 aPosition;layout(location=1) in float aSize;uniform mat4 uViewProj;uniform float uTime;out float vAlpha;void main(){vec3 p=aPosition;float t=uTime*.24; p.x+=sin(p.z*1.7+t*.5)*.19+mod(t+p.z*.31,1.)*.30;p.y+=sin(t+p.x*1.1)*.12;vec4 clip=uViewProj*vec4(p,1.);gl_Position=clip;gl_PointSize=clamp(aSize*210./max(2.,clip.w),1.,25.);vAlpha=(.34+.15*sin(t+p.z*5.))*smoothstep(40.,3.,clip.w);}`;
+const particleFS=`#version 300 es
+precision highp float;in float vAlpha;out vec4 o;void main(){float d=length(gl_PointCoord-.5);float a=exp(-d*d*30.)*vAlpha;o=vec4(.81,.64,.45,a);}`;
+let sceneProgram=program(sceneVS,sceneFS),shadowProgram=program(shadowVS,shadowFS),skyProgram=program(skyVS,skyFS),particleProgram=program(particleVS,particleFS);
+function uni(p,name){return gl.getUniformLocation(p,name==='uBones'?'uBones[0]':name);}const U={};for(let [kind,p,names] of [['scene',sceneProgram,['uModel','uViewProj','uSunViewProj','uBones','uSkin','uTex','uNormalRough','uWorldUV','uShadow','uCamera','uSunDir','uFogColor','uTint','uMetalness','uRoughness','uLight','uFogDensity','uTime','uShadowEnabled']],['shadow',shadowProgram,['uModel','uSunViewProj','uBones','uSkin']],['sky',skyProgram,['uTime','uAspect','uSkyTop','uSkyLow']],['particle',particleProgram,['uViewProj','uTime']]]){U[kind]={};names.forEach(k=>U[kind][k]=uni(p,k));}
+// Geometry, material and texture system
+function meshBuilder(){return{p:[],n:[],uv:[],tint:[],bone:[],weight:[],i:[]};}
+function vert(b,pos,normal,uv,tint=[1,1,1],bone=[0,0,0,0],weight=[1,0,0,0]){b.p.push(...pos);b.n.push(...normal);b.uv.push(...uv);b.tint.push(...tint);b.bone.push(...bone);b.weight.push(...weight);return b.p.length/3-1;}
+function tri(b,a,c,d){b.i.push(a,c,d);}
+function quad(b,a,c,d,e,n,uv=[0,0,1,1],tint=[1,1,1]){let v=vert(b,a,n,[uv[0],uv[1]],tint),w=vert(b,c,n,[uv[2],uv[1]],tint),x=vert(b,d,n,[uv[2],uv[3]],tint),y=vert(b,e,n,[uv[0],uv[3]],tint);tri(b,v,w,x);tri(b,v,x,y);}
+function append(dst,src,m=ident(),tint=[1,1,1]){let base=dst.p.length/3;for(let i=0;i<src.p.length;i+=3){let p=tx(m,src.p.slice(i,i+3));dst.p.push(...p);let n=[m[0]*src.n[i]+m[4]*src.n[i+1]+m[8]*src.n[i+2],m[1]*src.n[i]+m[5]*src.n[i+1]+m[9]*src.n[i+2],m[2]*src.n[i]+m[6]*src.n[i+1]+m[10]*src.n[i+2]];dst.n.push(...norm(n));let ti=i;dst.tint.push(src.tint[ti]*tint[0],src.tint[ti+1]*tint[1],src.tint[ti+2]*tint[2]);}dst.uv.push(...src.uv);dst.bone.push(...src.bone);dst.weight.push(...src.weight);src.i.forEach(v=>dst.i.push(v+base));}
+function boxGeom(w=1,h=1,d=1,repeat=1){let b=meshBuilder(),x=w/2,y=h/2,z=d/2;let faces=[[[x,-y,z],[x,-y,-z],[x,y,-z],[x,y,z],[1,0,0]], [[-x,-y,-z],[-x,-y,z],[-x,y,z],[-x,y,-z],[-1,0,0]], [[-x,y,z],[x,y,z],[x,y,-z],[-x,y,-z],[0,1,0]], [[-x,-y,-z],[x,-y,-z],[x,-y,z],[-x,-y,z],[0,-1,0]], [[-x,-y,z],[x,-y,z],[x,y,z],[-x,y,z],[0,0,1]], [[x,-y,-z],[-x,-y,-z],[-x,y,-z],[x,y,-z],[0,0,-1]]];faces.forEach((f,i)=>quad(b,...f.slice(0,4),f[4],[0,0,repeat,repeat],[i===2?1.06:.96,i===2?1.03:.96,i===2?1:.94]));return b;}
+function cylGeom(r1=.5,r2=.5,h=1,seg=12){let b=meshBuilder();for(let k=0;k<seg;k++){let a=TAU*k/seg,c=TAU*(k+1)/seg,s=Math.sin(a),co=Math.cos(a),s2=Math.sin(c),co2=Math.cos(c);let tilt=(r1-r2)/h;let n=norm([co,tilt,s]),n2=norm([co2,tilt,s2]);let ia=vert(b,[r1*co,-h/2,r1*s],n,[k/seg,0]),ib=vert(b,[r1*co2,-h/2,r1*s2],n2,[(k+1)/seg,0]),ic=vert(b,[r2*co2,h/2,r2*s2],n2,[(k+1)/seg,1]),id=vert(b,[r2*co,h/2,r2*s],n,[k/seg,1]);tri(b,ia,ic,ib);tri(b,ia,id,ic);let u=vert(b,[0,h/2,0],[0,1,0],[.5,.5]),v=vert(b,[r2*co,h/2,r2*s],[0,1,0],[.5+co*.5,.5+s*.5]),w=vert(b,[r2*co2,h/2,r2*s2],[0,1,0],[.5+co2*.5,.5+s2*.5]);tri(b,u,w,v);let u2=vert(b,[0,-h/2,0],[0,-1,0],[.5,.5]),v2=vert(b,[r1*co2,-h/2,r1*s2],[0,-1,0],[.5+co2*.5,.5+s2*.5]),w2=vert(b,[r1*co,-h/2,r1*s],[0,-1,0],[.5+co*.5,.5+s*.5]);tri(b,u2,w2,v2);}return b;}
+function sphereGeom(r=1,lat=10,lon=14){let b=meshBuilder();for(let j=0;j<lat;j++){for(let i=0;i<lon;i++){let quadp=[];for(let [u,v] of [[i/lon,j/lat],[(i+1)/lon,j/lat],[(i+1)/lon,(j+1)/lat],[i/lon,(j+1)/lat]]){let theta=PI*v,phi=TAU*u;let n=[Math.sin(theta)*Math.cos(phi),Math.cos(theta),Math.sin(theta)*Math.sin(phi)];quadp.push(vert(b,n.map(x=>x*r),n,[u,v]));}tri(b,quadp[0],quadp[1],quadp[2]);tri(b,quadp[0],quadp[2],quadp[3]);}}return b;}
+const primitives={box:boxGeom(),cylinder:cylGeom(.5,.5,1,24),sphere:sphereGeom(1,10,14)};const hiSphere=sphereGeom(1,22,28);
+function makeMesh(b){let vao=gl.createVertexArray();gl.bindVertexArray(vao);const attrs=[[b.p,0,3],[b.n,1,3],[b.uv,2,2],[b.tint,3,3],[b.bone,4,4],[b.weight,5,4]];let bs=[];for(let [arr,loc,size] of attrs){let vbo=gl.createBuffer();bs.push(vbo);gl.bindBuffer(gl.ARRAY_BUFFER,vbo);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(arr),gl.STATIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,size,gl.FLOAT,false,0,0);}let ebo=gl.createBuffer();gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER,ebo);let count=b.i.length;gl.bufferData(gl.ELEMENT_ARRAY_BUFFER,new Uint32Array(b.i),gl.STATIC_DRAW);gl.bindVertexArray(null);return{vao,count,buffers:bs,ebo};}
+function textureCanvas(type,w=256,h=256){let c=document.createElement('canvas');c.width=w;c.height=h;let x=c.getContext('2d'),im=x.createImageData(w,h),r=rng(type.split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,125));let base={wood:[120,87,61],darkwood:[67,49,35],pale:[166,142,107],sand:[152,111,78],plaster:[154,123,96],stone:[115,107,93],brick:[119,66,54],leather:[67,44,35],fabric:[79,66,56],skin:[181,130,94],roof:[65,58,57],metal:[145,136,122],black:[34,32,32],sage:[88,100,87],gold:[168,118,61],leaf:[78,82,51],canvas:[177,143,103]}[type]||[160,160,160];for(let j=0;j<h;j++)for(let i=0;i<w;i++){let n=(r()-.5)*24,v=0;if(type==='wood'||type==='darkwood'||type==='pale'||type==='roof'){v=13*Math.sin(j*.32+Math.sin(i*.04)*3)+8*Math.sin(j*.08)+5*Math.sin(j*.9);if(j%64===0)v=-35;}if(type==='sand'||type==='stone')v=13*Math.sin(i*.048)*Math.sin(j*.055);if(type==='fabric'||type==='canvas')v=4*Math.sin(i*1.45)*Math.cos(j*1.51);if(type==='leather')v=2*Math.sin(i*.31+j*.44);if(type==='brick'){let row=Math.floor(j/35),shift=(row%2)*40,edge=(((i+shift)%80)<2||(j%35)<3);v=edge?-32:6*Math.sin(i*.12);}let z=(j*w+i)*4;for(let k=0;k<3;k++)im.data[z+k]=clamp(base[k]+n+v,0,255);im.data[z+3]=255;}x.putImageData(im,0,0);if(type==='wood'||type==='darkwood'||type==='pale'){for(let k=0;k<25;k++){x.strokeStyle='rgba(28,16,9,'+(r()*.12)+')';x.lineWidth=.5+r()*1.8;let y=r()*h;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(w*.35,y+r()*5,w*.75,y-r()*5,w,y+r()*2);x.stroke();}for(let k=0;k<3;k++){let px=r()*w,py=r()*h;x.strokeStyle='rgba(36,18,9,.36)';x.beginPath();x.ellipse(px,py,7+r()*13,2+r()*3,0,0,TAU);x.stroke();}}return c;}
+function glTex(canvas,repeat=true){let t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,canvas);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,repeat?gl.REPEAT:gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,repeat?gl.REPEAT:gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.generateMipmap(gl.TEXTURE_2D);return t;}
+const PBR_ASSETS={"wood":{"albedo":"assets/pbr_00.jpg","normal":"assets/pbr_01.png","size":1536},"darkwood":{"albedo":"assets/pbr_02.jpg","normal":"assets/pbr_03.png","size":1536},"pale":{"albedo":"assets/pbr_04.jpg","normal":"assets/pbr_05.png","size":1536},"sand":{"albedo":"assets/pbr_06.jpg","normal":"assets/pbr_07.png","size":1536},"plaster":{"albedo":"assets/pbr_08.jpg","normal":"assets/pbr_09.png","size":1024},"stone":{"albedo":"assets/pbr_10.jpg","normal":"assets/pbr_11.png","size":1024},"brick":{"albedo":"assets/pbr_12.jpg","normal":"assets/pbr_13.png","size":512},"leather":{"albedo":"assets/pbr_14.jpg","normal":"assets/pbr_15.png","size":1024},"fabric":{"albedo":"assets/pbr_16.jpg","normal":"assets/pbr_17.png","size":1024},"skin":{"albedo":"assets/pbr_18.jpg","normal":"assets/pbr_19.png","size":1024},"roof":{"albedo":"assets/pbr_20.jpg","normal":"assets/pbr_21.png","size":1024},"metal":{"albedo":"assets/pbr_22.jpg","normal":"assets/pbr_23.png","size":512},"black":{"albedo":"assets/pbr_24.jpg","normal":"assets/pbr_25.png","size":512},"sage":{"albedo":"assets/pbr_26.jpg","normal":"assets/pbr_27.png","size":512},"gold":{"albedo":"assets/pbr_28.jpg","normal":"assets/pbr_29.png","size":512},"leaf":{"albedo":"assets/pbr_30.jpg","normal":"assets/pbr_31.png","size":512},"canvas":{"albedo":"assets/pbr_32.jpg","normal":"assets/pbr_33.png","size":512},"iron":{"albedo":"assets/pbr_34.jpg","normal":"assets/pbr_35.png","size":512},"steel":{"albedo":"assets/pbr_36.jpg","normal":"assets/pbr_37.png","size":1024}};
+function imageTexture(uri,normal=false){let t=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,t);
+let px=normal?new Uint8Array([128,128,255,220]):new Uint8Array([140,107,76,255]);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,1,1,0,gl.RGBA,gl.UNSIGNED_BYTE,px);
+gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.REPEAT);
+gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR_MIPMAP_LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);
+let im=new Image();im.onload=()=>{gl.bindTexture(gl.TEXTURE_2D,t);gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
+gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.generateMipmap(gl.TEXTURE_2D);
+if(gl.getExtension('EXT_texture_filter_anisotropic')){let ext=gl.getExtension('EXT_texture_filter_anisotropic');gl.texParameterf(gl.TEXTURE_2D,ext.TEXTURE_MAX_ANISOTROPY_EXT,8);}};
+im.onerror=()=>console.warn('PBR image unavailable');im.src=uri;return t;}
+const textures={},normalMaps={};for(let [name,texture] of Object.entries(PBR_ASSETS)){textures[name]=imageTexture(texture.albedo);normalMaps[name]=imageTexture(texture.normal,true);}
+const flatNormal=glTex((()=>{let c=document.createElement('canvas');c.width=2;c.height=2;let x=c.getContext('2d');x.fillStyle='rgba(128,128,255,0.85)';x.fillRect(0,0,2,2);return c;})());
+
+function textTex(text,style={}){let c=document.createElement('canvas');c.width=1024;c.height=256;let x=c.getContext('2d');x.fillStyle=style.bg||'#3c2820';x.fillRect(0,0,1024,256);let r=rng(text.length*77);for(let i=0;i<340;i++){let a=r()*.12;x.fillStyle=`rgba(255,214,148,${a})`;x.fillRect(r()*1024,r()*256,r()*3+1,r()*2+1);}x.strokeStyle='rgba(233,191,124,.55)';x.lineWidth=6;x.strokeRect(14,16,996,222);x.strokeStyle='rgba(233,191,124,.24)';x.lineWidth=2;x.strokeRect(27,28,970,198);x.fillStyle=style.fg||'#ead1a2';let size=text.length>16?83:text.length>10?112:139;x.font=`bold ${size}px Georgia`;x.textAlign='center';x.textBaseline='middle';x.shadowColor='#110c0a';x.shadowBlur=4;x.fillText(text,512,134,960);return glTex(c,false);}
+const signTextures=['SALOON','BANK','GENERAL STORE','HOTEL','UNDERTAKER','SHERIFF','BLACKSMITH','WHISKEY','RED ROCK','LIVERY'].map(t=>textTex(t));
+const material={};function mat(name,tex,metal=.0,rough=.85,tint=[1,1,1],light=1){material[name]={tex:textures[tex]||tex,nrTex:normalMaps[tex]||flatNormal,metal,rough,tint,light};}
+mat('wood','wood',.0,.92);mat('darkwood','darkwood',0,.86);mat('pale','pale',0,.91);mat('plaster','plaster',0,.93);mat('stone','stone',0,.94);mat('sand','sand',0,1);mat('brick','brick',0,.96);mat('leather','leather',0,.78);mat('fabric','fabric',0,.98);mat('skin','skin',0,.9);mat('roof','roof',0,.95);mat('iron','metal',.85,.32,[.55,.53,.49]);mat('steel','metal',.92,.22,[.95,.97,1]);mat('gold','gold',.74,.28,[1.15,.92,.58]);mat('black','black',.04,.83);mat('sage','sage',0,.90);mat('canvas','canvas',0,.96);mat('leaf','leaf',0,.94);
+signTextures.forEach((tex,i)=>mat('sign'+i,tex,0,.88));
+const groups={};function batch(name,primitive,m,tint=[1,1,1]){if(!groups[name])groups[name]=meshBuilder();append(groups[name],primitives[primitive]||primitive,m,tint);}
+const B=(ma,x,y,z,w,h,d,tint)=>batch(ma,'box',compose(translate(x,y,z),scale(w,h,d)),tint);
+const C=(ma,x,y,z,r1,r2,h,ang=0,tint)=>batch(ma,cylGeom(r1,r2,h,12),compose(translate(x,y,z),ry(ang)),tint);
+const S=(ma,x,y,z,r,tint)=>batch(ma,'sphere',compose(translate(x,y,z),scale(r,r,r)),tint);
+function rod(ma,a,b,r=.06,tint){let dir=sub(b,a),l=Math.hypot(...dir),u=norm(dir),axis=cross([0,1,0],u),angle=Math.acos(clamp(dot([0,1,0],u),-1,1));let m=translate(...a.map((v,i)=>v+dir[i]/2));if(Math.hypot(...axis)>.001){let ax=norm(axis); // Rodrigues rotation
+let c=Math.cos(angle),s=Math.sin(angle),q=1-c,[x,y,z]=ax;let rot=new Float32Array([c+x*x*q,y*x*q+z*s,z*x*q-y*s,0,x*y*q-z*s,c+y*y*q,z*y*q+x*s,0,x*z*q+y*s,y*z*q-x*s,c+z*z*q,0,0,0,0,1]);m=mul(m,rot);}batch(ma,cylGeom(r,r,l,8),m,tint);}
+// Town geometry. Everything is built from actual 3D meshes.
+function worldObject(ma,geo,local,root,tint){batch(ma,geo,mul(root,local),tint);}
+function building(side,index,style,townIndex){let z=4-index*9.4,x=side*8.2,root=compose(translate(x,0,z),ry(side===-1?PI/2:-PI/2));const p=(ma,px,py,pz,w,h,d,tint)=>worldObject(ma,'box',compose(translate(px,py,pz),scale(w,h,d)),root,tint);const cylinder=(ma,px,py,pz,r,h,tint)=>worldObject(ma,cylGeom(r,r,h,10),translate(px,py,pz),root,tint);
+let h=style===0?5.65:style===3?5.05:4.30,w=5.5+random()*1.5,depth=4.6;let facade=['wood','darkwood','plaster','pale','sage'][style%5];p('stone',0,.14,-2.1,w+.6,.28,depth+.4);p(facade,0,h*.5,-2.2,w,h,depth);p('darkwood',0,h+.18,-2.3,w+.48,.20,depth+.5);p('roof',0,h+.32,-2.3,w+.8,.20,depth+.8);
+// individual weathered horizontal facade boards
+for(let yy=.35;yy<h;yy+=.29){p(style%2?'wood':'pale',0,yy,.165,w,.06,.05,[.76+random()*.35,.74+random()*.35,.70+random()*.37]);}
+for(let k of [-1,1]){p('darkwood',k*(w*.5-.15),h*.47,.25,.18,h,.22);p('pale',k*(w*.5-.06),h*.5,.34,.09,h,.12);}
+// door
+p('darkwood',0,1.16,.29,1.22,2.32,.14);p('wood',0,1.2,.38,1.05,2.13,.07);p('iron',.37,1.18,.46,.07,.1,.07);
+for(let k of [-1,1]){let q=k*(w*.5-1.2);p('darkwood',q,1.8,.29,1.09,1.40,.09);p('black',q,1.8,.39,.84,1.14,.02);p('pale',q,1.8,.43,.055,1.24,.04);p('pale',q,1.8,.44,.92,.045,.05);p('gold',q,1.68,.48,.8,.27,.045,[.95,.85,.7]);}
+// porch, columns, steps
+p('pale',0,.30,1.75,w+.3,.3,3.0);p('darkwood',0,.15,3.28,w+.3,.26,.72);p('wood',0,.15,3.6,w+.3,.24,.40);p('darkwood',0,3.12,1.3,w+.4,.17,2.95);for(let k of [-1,1]){p('darkwood',k*(w*.45),1.68,2.7,.2,3.17,.23);p('wood',k*(w*.45),1.66,2.72,.11,3.06,.1);p('darkwood',k*(w*.45),.55,1.75,.15,.12,2.9);}
+// false-front saloon facade with name sign
+p('darkwood',0,h+.76,.08,w+.8,1.48,.29);p('pale',0,h+.78,.26,w+.35,1.12,.1);let si=style===0?0:style===1?3:style===2?2:style===3?1:style===4?4:5;worldObject('sign'+si,'box',compose(translate(0,h+.79,.36),scale(w-1.0,.84,.04)),root);p('darkwood',0,h+1.55,.14,w+1.1,.18,.38);
+for(let k of [-1,1])p('darkwood',k*(w*.5-.35),h+.78,.28,.12,1.4,.12);
+// upper windows on hotels
+if(h>4.9){for(let k of [-1,0,1]){p('darkwood',k*1.6,h-.88,.29,.88,1.18,.08);p('black',k*1.6,h-.88,.36,.66,.96,.03);p('wood',k*1.6,h-.88,.42,.06,1.0,.04);}}
+// balcony rails on hotel/saloon
+if(style===0||style===3){p('pale',0,3.62,1.35,w+.24,.17,2.2);for(let k=-3;k<=3;k++){p('darkwood',k*w/7,4.1,2.27,.10,1.1,.11);}p('pale',0,4.62,2.26,w+.2,.14,.17);}
+// lanterns by door
+for(let k of [-1,1]){p('iron',k*.93,2.56,.66,.17,.32,.16);p('gold',k*.93,2.56,.75,.12,.24,.08);p('iron',k*.93,2.76,.73,.13,.06,.1);}
+}
+for(let side of [-1,1])for(let i=0;i<5;i++)building(side,i,(i+(side===1?2:0))%5,0);
+// Continuous dirt street & wheel grooves
+batch('sand','box',compose(translate(0,-.29,-13),scale(17,.34,86)));
+for(let x of [-2.55,-2.25,2.25,2.55])B('darkwood',x,-.10,-14,.13,.006,63,[.50,.46,.38]);
+let stoneR=rng(1133);for(let i=0;i<630;i++){let x=(stoneR()-.5)*17,z=stoneR()*67-45;let h=stoneR()*.035+.018;B(i%3?'stone':'sand',x,-.075,z,h*.8,h*.4,h*(1+stoneR()*2),[.62+stoneR()*.57,.62+stoneR()*.48,.6+stoneR()*.4]);}
+// Sidewalk stairs and fence posts
+for(let side of [-1,1]){for(let i=0;i<17;i++){let z=7-i*3.3,x=side*5.98;B('wood',x,.28,z,.22,.58,.22);B('darkwood',x,.62,z,.15,.09,.16);}for(let z of [-43,-36,-29,-22,-15,-8,-1,6]){let x=side*5.96;B('darkwood',x,.49,z,.13,.78,.17);}}
+// Water barrels with ring details
+function barrel(x,z){C('darkwood',x,.49,z,.38,.43,.86);for(let yy of [.20,.67])C('iron',x,yy,z,.42,.42,.08);C('pale',x,.91,z,.33,.33,.05);}for(let side of [-1,1])for(let i=0;i<8;i++){barrel(side*(5.7+stoneR()*.3),5-i*6.1+stoneR()*2);}
+function wheel(x,y,z){let root=translate(x,y,z);let tire=cylGeom(.77,.77,.09,24);worldObject('iron',tire,compose(translate(0,0,0),rz(PI/2)),root);let ring=cylGeom(.65,.65,.11,22);worldObject('darkwood',ring,compose(translate(0,0,0),rz(PI/2)),root);for(let i=0;i<10;i++){let a=TAU*i/10;let xx=Math.cos(a)*.62,yy=Math.sin(a)*.62;let mm=compose(root,translate(0,xx,yy),scale(.09,.09,.09)); // spokes lie in yz plane
+rod('pale',[x,y,z],[x,y+xx,z+yy],.055);}C('iron',x,y,z,.14,.14,.17);}
+// Wagon, stagecoach and roadside carts
+function cart(x,z){B('darkwood',x,1.36,z,1.9,.28,3.2);B('wood',x,1.63,z,1.95,.65,2.85);for(let s of [-1,1]){B('wood',x+s*1,1.96,z,.12,.9,2.92);for(let zz of [-.94,.94])wheel(x+s*1.1,.86,z+zz);}B('darkwood',x,1.1,z-2,.18,.25,1.55);}
+cart(-6.05,-15.7);cart(6.15,-32);
+// Well, hanging bars, telegraph poles
+C('stone',4.25,.42,-4,.82,.87,.76);C('darkwood',4.25,.85,-4,.92,.92,.08);for(let sx of [-1,1])B('darkwood',4.25+sx*.76,1.8,-4,.16,2.4,.17);B('pale',4.25,2.95,-4,2,.17,.18);
+for(let side of [-1,1])for(let i=0;i<4;i++){let x=side*6.3,z=9-i*18;C('darkwood',x,3,z,.13,.17,6);B('darkwood',x,5.5,z,1.7,.13,.14);for(let k of [-1,1])S('black',x+k*.65,5.46,z,.12);}
+// Cacti and scrub around outer buildings
+for(let i=0;i<45;i++){let side=stoneR()>.5?1:-1,x=side*(12+stoneR()*27),z=stoneR()*90-60;if(i%3===0){C('sage',x,.90,z,.15,.20,1.8);C('sage',x+.3,1.0,z,.08,.08,.72);C('sage',x-.35,.73,z,.08,.08,.54);}else{S('leaf',x,.14,z,.25+stoneR()*.45,[.8,.72,.52]);}}
+// distant mesas and rocky mountains, actual meshes
+function mesa(x,z,s,h){B('stone',x,h*.5-1.2,z,s*1.9,h,s,[.70,.63,.58]);B('stone',x,h*.88,z,s*1.4,h*.22,s*.88,[.64,.57,.54]);B('sand',x,h*.99,z,s*1.56,.18,s*.98,[.6,.45,.35]);}
+mesa(-55,-110,12,28);mesa(46,-124,19,35);mesa(-100,-210,25,54);mesa(96,-218,29,64);
+// foreground dust shrubs/rocks for depth
+for(let i=0;i<85;i++){let side=stoneR()>.5?1:-1,x=side*(8+stoneR()*17),z=stoneR()*80-57;S('stone',x,stoneR()*.09,z,.13+stoneR()*.45,[.68,.66,.63]);}
+// Authentic three-dimensional signposts and hanging plank
+for(let z of [-7.5,-28]){B('darkwood',-5.65,2.55,z,.15,3.3,.17);B('darkwood',-4.9,3.9,z,.16,.1,1.65);}
+
+// Extra environmental set-dressing: useful up-close foreground depth and period props.
+function hitchingPost(x,z){
+ for(let j of [-1,1]){B('darkwood',x+j*1.18,.65,z,.23,1.3,.23);B('pale',x+j*1.18,1.35,z,.31,.10,.31);}
+ B('darkwood',x,1.12,z,2.7,.18,.16);
+ for(let q=0;q<=20;q++){let t=q/20;S('leather',x-1+t*1.9,.81+Math.sin(t*PI)*.26,z+.09,.018,[.73,.67,.58]);}
+}
+for(let z of [-10.5,-31.7])hitchingPost(6.3,z);
+for(let z of [-19,-39])hitchingPost(-6.3,z);
+// Wooden trough with metallic brackets and reflective water ripples.
+function trough(x,z){
+ B('darkwood',x,.46,z,2.26,.86,.9);B('black',x,.90,z,2.04,.035,.73,[.55,.55,.56]);
+ for(let k of [-1,1]){B('iron',x+k*.99,.51,z,.065,.88,.98);}
+ for(let j=0;j<5;j++)B('steel',x-.8+j*.4,.927,z,.16,.004,.54,[.41,.43,.44]);
+}
+trough(-6.75,-10.7);
+// Broken buckboard cart, spokes, axle, cargo and canvas bags.
+function cart(x,z){
+ B('wood',x,.88,z,2.26,.19,3.10,[.8,.73,.62]);
+ B('darkwood',x,.95,z-1.43,2.2,.82,.12);B('darkwood',x,.94,z+1.43,2.2,.82,.12);
+ for(let side of [-1,1]){
+  let xx=x+side*1.18;
+  for(let zz of [z-1.1,z+1.1]){
+   batch('iron',cylGeom(.72,.72,.075,32),compose(translate(xx,.64,zz),rz(PI/2)),[.68,.68,.64]);
+   batch('darkwood',cylGeom(.61,.61,.052,32),compose(translate(xx,.64,zz),rz(PI/2)),[.8,.76,.68]);
+   for(let a=0;a<10;a++){let t=a*TAU/10;rod('pale',[xx,.64,zz],[xx,.64+Math.cos(t)*.61,zz+Math.sin(t)*.61],.024,[.8,.73,.66]);}
+  }
+ }
+ B('canvas',x,1.32,z,.81,.62,1.07,[.85,.79,.67]);B('canvas',x-.5,1.28,z-.68,.62,.45,.61,[.73,.68,.60]);
+}
+cart(-12.4,-21.5);
+// Hand-forged horseshoes and wooden sign details.
+for(let z of [-4.5,-17]){
+ for(let j=0;j<5;j++)B('pale',-7.5+.4*j,2.82+j*.02,z+.06,.24,.08,.06,[.79,.70,.61]);
+}
+
+const staticMeshes=Object.entries(groups).map(([ma,b])=>({mesh:makeMesh(b),ma,model:ident(),skin:false,shadow:ma!=='sand'}));
+// Character models: articulated six-joint gunfighter rigs with smooth GPU-skinned sleeves.
+function addPart(bags,ma,geo,m,tint=[1,1,1]){if(!bags[ma])bags[ma]=meshBuilder();append(bags[ma],typeof geo==='string'?primitives[geo]:geo,m,tint);}
+function hatBrimGeom(seed=0){let geo=meshBuilder(),N=64,M=8;for(let j=0;j<M;j++){let r=.235+(.54-.235)*j/(M-1);for(let i=0;i<N;i++){let t=i/N*TAU;let wave=Math.sin(t*2+seed)*.025+Math.sin(t*4+seed*.4)*.012;let yy=(r-.235)*(.10*Math.cos(t*2.0)+.035*Math.sin(t*3.0))+wave;
+let n=norm([-.08*Math.cos(t),1.,-.07*Math.sin(t)]);vert(geo,[Math.cos(t)*r,yy,Math.sin(t)*r],n,[i/N,j/M]);}}
+for(let j=0;j<M-1;j++)for(let i=0;i<N;i++){let k=j*N+i,k2=j*N+(i+1)%N,t=(j+1)*N+i,t2=(j+1)*N+(i+1)%N;tri(geo,k,t,k2);tri(geo,k2,t,t2);}return geo;}
+const buildCyl=(bags,ma,x,y,z,r1,r2,h,matr=ident(),tint=[1,1,1])=>addPart(bags,ma,cylGeom(r1,r2,h,14),mul(matr,translate(x,y,z)),tint);
+
+// FRONTIER CINEMATIC: procedurally sculpted, optimized meshes.  Every vertex is real 3D geometry.
+function loftSurface(rows, count=32, seam=0, open=TAU){
+ let out=meshBuilder();
+ for(let j=0;j<rows.length;j++){
+  let q=rows[j];
+  for(let i=0;i<=count;i++){
+   let a=seam+open*i/count, cs=Math.cos(a),sn=Math.sin(a),fold=1+(.012*Math.sin(a*7+q.y*14)+.009*Math.sin(a*13-q.y*5));
+   let x=(q.x||0)+cs*q.rx*fold,z=(q.z||0)+sn*q.rz*fold;
+   let nr=norm([cs/Math.max(.01,q.rx),q.slope||0,sn/Math.max(.01,q.rz)]);
+   vert(out,[x,q.y,z],nr,[i/count,j/Math.max(1,rows.length-1)],q.tint||[1,1,1]);
+  }
+ }
+ for(let j=0;j<rows.length-1;j++)for(let i=0;i<count;i++){
+  let lo=j*(count+1)+i,hi=(j+1)*(count+1)+i;
+  tri(out,lo,hi,lo+1);tri(out,lo+1,hi,hi+1);
+ }
+ return out;
+}
+function polyPatch(points, tint=[1,1,1]){
+ let g=meshBuilder();
+ for(let p of points)vert(g,p,[0,.13,1],[p[0]*2+.5,p[1]*.7],tint);
+ for(let i=1;i<points.length-1;i++){tri(g,0,i,i+1);tri(g,0,i+1,i);}
+ return g;
+}
+function roundedHead(seed){
+ const g=meshBuilder(),L=30,N=44,old=seed===4||seed===2;
+ for(let j=0;j<=L;j++)for(let i=0;i<=N;i++){
+  let theta=j/L*PI,phi=i/N*TAU,c=Math.cos(phi),s=Math.sin(phi),v=Math.cos(theta),rr=Math.sin(theta);
+  let jaw=v<-.12?1.-.27*Math.min(1,(-v-.12)/.88):1.;
+  let cheek=1+.055*Math.exp(-Math.pow((v+.08)/.24,2));
+  let x=rr*c*.247*jaw*cheek,y=2.189+v*.327,z=.032+rr*s*.224;
+  if(s>.4)z+=.034*Math.exp(-Math.pow((v+.09)/.28,2));
+  if(seed===1){x*=.91;y+=.015;z-=.013;}
+  let tone=[.92,.85,.76];if(old)tone=[.82,.80,.76];
+  let grain=.984+.024*Math.sin(phi*11+theta*16)*Math.sin(theta*21);
+  let a=vert(g,[x,y,z],norm([c*rr*1.08,v,s*rr]),[i/N,j/L],tone.map(q=>q*grain));
+ }
+ for(let j=0;j<L;j++)for(let i=0;i<N;i++){
+  let a=j*(N+1)+i,b=a+N+1;tri(g,a,a+1,b);tri(g,a+1,b+1,b);
+ }
+ return g;
+}
+function beardGeo(seed){ // short geometric stubble around chin and jaw, varied by character
+ let g=meshBuilder(),rngH=rng(177+seed*187);
+ for(let i=0;i<65;i++){
+  let phi=rngH()*TAU,v=-.32-rngH()*.45;
+  if(Math.sin(phi)<-.10)continue;
+  let rr=Math.sqrt(Math.max(0,1-v*v)),jaw=1-.27*Math.min(1,(-v-.12)/.88);
+  let x=rr*Math.cos(phi)*.248*jaw,y=2.19+v*.327,z=.034+rr*Math.sin(phi)*.232+.011;
+  let n=norm([x*.8,-.45,z]);let len=.018+rngH()*.022;
+  let a=vert(g,[x,y,z],n,[0,0],[.55,.52,.48]);
+  let b=vert(g,[x+len*.6,y-len*.8,z+.009],n,[.03,.4],[.56,.5,.43]);
+  let c=vert(g,[x-len*.5,y-len*.9,z+.007],n,[.07,.6],[.61,.57,.53]);tri(g,a,b,c);
+ }
+ return g;
+}
+function fabricFoldStrip(p0,p1,wide=.024){
+ let g=meshBuilder(),mid=p0.map((q,i)=>(q+p1[i])*.5);
+ let k=vert(g,[p0[0]-wide,p0[1],p0[2]],[0,0,1],[0,0]),
+ k2=vert(g,[p0[0]+wide,p0[1],p0[2]],[0,0,1],[.3,0]),
+ k3=vert(g,[mid[0]+wide*.7,mid[1],mid[2]+.022],[0,0,1],[.4,.5]),
+ k4=vert(g,[p1[0],p1[1],p1[2]],[0,0,1],[.5,1]);
+ tri(g,k,k2,k3);tri(g,k,k3,k4);return g;
+}
+function tailorDetails(seed,part,b,cy,sp,shade){
+ let earth=seed===0,rose=seed===1,marshal=seed===4,old=seed===2;
+ let cuff=seed===3?[.28,.30,.34]:[.57,.49,.40];
+ const coat=[
+  {y:.40,rx:.54,rz:.36,z:-.072,slope:.12,tint:shade.map(v=>v*.72)},
+  {y:.67,rx:.49,rz:.31,z:-.068,tint:shade.map(v=>v*.82)},
+  {y:1.03,rx:.415,rz:.285,z:-.055,tint:shade.map(v=>v*.86)},
+  {y:1.39,rx:.426,rz:.300,z:-.060,tint:shade},
+  {y:1.66,rx:.492,rz:.27,z:-.05,slope:-.14,tint:shade.map(v=>v*.92)}
+ ];
+ part('fabric',loftSurface(coat,56,PI/2+.34,TAU-.68),ident(),[1,1,1]);
+ // Shaped open vest, cloth side panels and double-breasted buttons.
+ const vest=[[-.205,1.58,.344],[.205,1.58,.344],[.255,1.11,.351],[.176,.86,.388],[-.167,.86,.388],[-.260,1.11,.351]];
+ part('leather',polyPatch(vest,[.48,.40,.34]),ident(),[1,1,1]);
+ for(let y=1.40;y>.94;y-=.115)for(let sx of [-.10,.10])sp('gold',sx,y,.392,.024,.024,.018,[.80,.70,.55]);
+ // Raised fold-over lapels and long-tail split panels with seams.
+ for(let s of [-1,1]){
+  let flap=[[s*.17,1.70,.31],[s*.44,1.55,.275],[s*.25,1.34,.432],[s*.40,1.09,.33],[s*.275,1.14,.43]];
+  part('fabric',polyPatch(flap,shade.map(v=>v*.63)));
+  part('fabric',fabricFoldStrip([s*.25,1.34,.44],[s*.29,1.07,.393],.015),ident(),shade.map(v=>v*.47));
+  part('fabric',loftSurface([
+   {x:s*.245,z:-.22,rx:.198,rz:.24,y:.22,tint:shade.map(v=>v*.72)},
+   {x:s*.232,z:-.17,rx:.205,rz:.225,y:.53,tint:shade.map(v=>v*.83)},
+   {x:s*.217,z:-.11,rx:.208,rz:.220,y:.9,tint:shade.map(v=>v*.79)}
+  ],24));
+  // Real boot profile: shaft, stitched toe, heel, spur gear.
+  b('leather',s*.207,.335,.059,.301,.27,.29,[.51,.43,.36]);
+  sp('leather',s*.209,.131,.185,.171,.095,.297,[.49,.43,.36]);
+  b('black',s*.210,.078,.156,.328,.059,.414,[.52,.50,.47]);
+  b('leather',s*.210,.064,-.024,.198,.11,.190,[.45,.40,.35]);
+  cy('iron',s*.205,.283,-.073,.155,.155,.025,[.47,.48,.47]);
+  for(let j=0;j<5;j++)b('pale',s*.205,.38+j*.066,.222,.125,.008,.015,[.54,.45,.39]);
+  // Duster pocket flap with button and seam thread.
+  b('fabric',s*.325,1.075,.295,.175,.102,.028,shade.map(v=>v*.77));
+  sp('gold',s*.32,1.073,.319,.023,.022,.012,[.82,.7,.54]);
+  for(let j=0;j<5;j++){
+   let z=.254+j*.012;sp('darkwood',s*(.46-j*.014),.54+j*.087,z,.0065,.014,.012,[.67,.59,.49]);
+  }
+ }
+ // Hat details: multiple shaped crowns, metal pin, feather, leather sweatband.
+ let top=rose?2.79:seed===3?2.91:2.79;
+ cy('leather',0,2.625,0,.286,.289,.065,[.59,.52,.43]);
+ sp('gold',.21,2.625,.14,.053,.048,.021,[.85,.78,.58]);
+ if(seed===2||seed===3){ // feather lies slightly askew
+  part('fabric',polyPatch([[.27,2.61,.08],[.33,2.89,.022],[.46,3.06,-.02],[.40,2.76,.058]],[.73,.73,.70]));
+ }
+ // High frequency details visible at close range.
+ for(let s of [-1,1]){
+  // eyelids, lashes, iris and tear line
+  sp('skin',s*.114,2.253,.249,.075,.040,.028,[.88,.78,.70]);
+  sp('black',s*.114,2.246,.280,.049,.029,.015,[.40,.37,.32]);
+  sp('gold',s*.111,2.246,.296,.018,.020,.006,[.62,.56,.47]);
+  sp('pale',s*.101,2.257,.303,.008,.008,.005,[1.13,1.11,1.05]);
+  sp('skin',s*.111,2.214,.276,.075,.020,.025,[.86,.75,.64]);
+  // ears folded over the existing cartilage oval
+  sp('skin',s*.264,2.172,.036,.063,.107,.034,[.85,.76,.66]);
+  sp('darkwood',s*.267,2.175,.073,.025,.062,.014,[.62,.45,.38]);
+  // cheek contour, nasolabial crease
+  sp('skin',s*.167,2.099,.202,.066,.046,.067,[.95,.84,.75]);
+ }
+ sp('skin',0,2.111,.362,.087,.061,.058,[1.01,.92,.85]);
+ // Lips and chin, small scar variation on veteran duelists.
+ sp('darkwood',0,2.017,.312,.083,.014,.016,[.72,.48,.46]);
+ sp('skin',0,1.975,.282,.123,.041,.052,[.90,.78,.68]);
+ if(seed===0||seed===4){
+  part('darkwood',fabricFoldStrip([-.19,2.130,.238],[-.145,2.064,.272],.004),ident(),[.73,.59,.53]);
+ }
+ // Hairline and sideburns; Rose has a long braided ponytail, other gunslingers have scruffy hair.
+ for(let s of [-1,1]){
+  for(let j=0;j<5;j++){
+   let y=2.39-j*.055;
+   sp(seed===4?'pale':'darkwood',s*(.198+j*.011),y,-.025+j*.020,.052,.047,.057,seed===4?[.59,.54,.51]:[.58,.54,.46]);
+  }
+ }
+ if(rose){
+  // Rose is a distinct outlaw, not a recolored moustached male mesh.
+  for(let i=0;i<9;i++){let y=2.25-i*.115,rr=.109*(1-i/12);
+   sp('darkwood',-.19-(i%2)*.045,y,-.21,rr,rr*.65,rr*.64,[.58,.31,.27]);
+  }
+  sp('gold',-.22,1.38,-.22,.065,.07,.052,[.70,.60,.44]);
+  sp('fabric',0,2.011,.314,.12,.014,.012,[.82,.44,.43]);
+ }else if(seed===2||seed===4){
+  // Strands of stubble and close beard, all actual triangles on the sculpted surface.
+  part('darkwood',beardGeo(seed),ident(),seed===4?[.73,.69,.65]:[.54,.52,.49]);
+ }
+ if(seed===3){ // black gambler/assassin: dramatic braided vest cord and studs
+  for(let j=0;j<8;j++)sp('gold',.33,1.57-j*.07,.37,.015,.015,.013,[.88,.71,.45]);
+ }
+ if(seed===4){ // Marshal's badge
+  sp('gold',-.17,1.42,.455,.078,.079,.035,[1.10,.98,.68]);
+  for(let i=0;i<6;i++){let a=i*TAU/6;sp('gold',-.17+Math.cos(a)*.078,1.42+Math.sin(a)*.078,.449,.033,.035,.021,[1.02,.89,.64]);}
+ }
+ // Cartridge loops and shells carried across the chest, non-flat geometry.
+ for(let i=0;i<11;i++){
+  let f=i/10,x=.31-f*.59,y=1.61-f*.54;
+  cy('gold',x,y,.488,.026,.026,.115,[.83,.66,.39]);
+  sp('black',x,y+.054,.488,.027,.012,.020,[.51,.49,.46]);
+ }
+}
+
+function buildPerson(seed){let r=rng(1429+seed*91),bags={},coatShades=[[.78,.69,.55],[.46,.46,.47],[.49,.62,.57],[.27,.29,.34],[.33,.3,.28]],shade=coatShades[seed];
+const part=(ma,primitive,m,tint)=>addPart(bags,ma,primitive==='sphere'?hiSphere:primitive,m,tint);
+const b=(ma,x,y,z,w,h,d,tint)=>part(ma,'box',compose(translate(x,y,z),scale(w,h,d)),tint);
+const cy=(ma,x,y,z,rr1,rr2,h,tint)=>buildCyl(bags,ma,x,y,z,rr1,rr2,h,ident(),tint);
+const sp=(ma,x,y,z,sx,sy,sz,tint)=>part(ma,'sphere',compose(translate(x,y,z),scale(sx,sy,sz)),tint);
+// boots, legs, leather knee seams
+for(let s of [-1,1]){cy('fabric',s*.20,.48,.015,.16,.17,.91,[.56,.48,.40]);cy('leather',s*.20,.19,.068,.18,.19,.36,[.45,.40,.36]);sp('leather',s*.20,.125,.18,.19,.11,.30,[.47,.40,.34]);b('darkwood',s*.20,.73,-.08,.31,.035,.27,[.8,.72,.67]);}
+// long coat torso, vest and shirt
+cy('fabric',0,1.28,-.05,.42,.49,.96,shade);
+sp('fabric',0,1.47,-.02,.43,.41,.26,shade);
+b('pale',0,1.38,.34,.27,.66,.055,[.80,.76,.67]);
+for(let s of [-1,1]){b('fabric',s*.31,.66,-.11,.26,.93,.25,shade.map(x=>x*.7));b('darkwood',s*.24,1.43,.39,.15,.76,.07,[.64,.61,.56]);b('gold',s*.13,1.17,.44,.032,.04,.035,[.7,.6,.38]);}
+// Bandana and neckcloth
+cy('fabric',0,1.76,.045,.19,.18,.23,seed===1?[.86,.34,.33]:[.73,.36,.26]);b('fabric',0,1.62,.31,.17,.36,.07,[.67,.28,.24]);
+// gunbelt, ammo loops, holster
+cy('leather',0,1.025,0,.44,.44,.135,[.62,.48,.34]);b('gold',0,1.02,.435,.19,.13,.048);b('black',0,1.02,.468,.14,.08,.03);b('leather',.45,.75,.065,.20,.39,.27,[.65,.44,.31]);
+for(let i=0;i<8;i++){let a=-1.05+i*.3;b('gold',Math.sin(a)*.45,1.06,Math.cos(a)*.39,.045,.14,.06,[.79,.78,.65]);}
+// head, neck, ears, facial structure
+cy('skin',0,1.89,.035,.15,.17,.25,[.91,.82,.74]);part('skin',roundedHead(seed),ident(),[1,1,1]);sp('skin',-.269,2.16,.00,.064,.085,.06,[.91,.78,.64]);sp('skin',.269,2.16,.00,.064,.085,.06,[.91,.78,.64]);
+sp('skin',0,2.116,.242,.095,.115,.12,[1.04,.90,.81]);
+for(let s of [-1,1]){sp('black',s*.113,2.24,.22,.035,.025,.018,[.51,.48,.42]);b('black',s*.11,2.305,.225,.145,.025,.034,[.52,.42,.34]);}
+sp('darkwood',0,2.043,.233,.15,.045,.035,[.44,.32,.26]);
+// moustache and rugged beard, variable by enemy
+if(seed!==1)for(let s of [-1,1])sp('darkwood',s*.088,2.106,.298,.09,.04,.034,seed===4?[.78,.70,.63]:[.51,.39,.28]);
+if(seed===2||seed===4){sp('darkwood',0,1.99,.204,.17,.095,.09,[.5,.46,.36]);}
+// hat brim, crown, band, rounded crown
+part('darkwood',hatBrimGeom(seed),translate(0,2.52,0),seed===1?[.45,.42,.42]:[.42,.35,.31]);
+cy('fabric',0,2.70,0,.245,.29,.34,seed===1?[.43,.38,.38]:[.43,.39,.34]);cy('black',0,2.60,0,.305,.305,.052,[.74,.62,.5]);
+// The crease gives the hat a silhouette distinct from a simple cylinder.
+for(let s of [-1,1])sp('fabric',s*.11,2.875,0,.11,.045,.15,[.48,.42,.36]);
+// Sculpted facial contours, brows, nose bridge and jaw definition.
+for(let s of [-1,1]){sp('skin',s*.176,2.132,.156,.104,.076,.076,[.88,.76,.65]);
+sp('skin',s*.127,2.009,.163,.095,.065,.091,[.86,.72,.62]);
+sp('black',s*.120,2.245,.260,.044,.015,.014,[.54,.42,.33]);
+sp('skin',s*.032,2.066,.337,.047,.026,.026,[.91,.78,.68]);
+// Jacket shoulder seam and articulated fabric fold ridges.
+for(let j=0;j<5;j++){let y=1.56-j*.15; b('fabric',s*(.305+j*.013),y,.294,.040,.037,.1,shade.map(q=>q*(.70+j*.027)));}
+// Revolver cartridges, leather belt tooling and cuffs.
+for(let j=0;j<4;j++){b('gold',s*(.26+j*.065),1.031,.34,.025,.10,.018,[.81,.67,.40]);}
+sp('gold',s*.35,.28,.223,.028,.029,.035,[.67,.53,.32]);
+}
+sp('skin',0,2.158,.326,.062,.092,.087,[.97,.81,.70]); // nose bridge
+sp('skin',0,2.104,.388,.096,.056,.092,[.99,.85,.72]); // nose tip
+sp('darkwood',0,2.017,.298,.13,.018,.017,[.65,.45,.36]); // mouth
+// Leather cross-shoulder strap with glinting metal studs.
+for(let i=0;i<11;i++){let f=i/10;let xx=.32-f*.59,yy=1.61-f*.54;
+let m=compose(translate(xx,yy,.43),rz(-.54),scale(.078,.125,.038));part('leather','box',m,[.66,.50,.39]);
+if(i%2===0)sp('gold',xx,yy,.468,.028,.024,.014,[.65,.54,.35]);}
+// Jacket lapels are raised polygons rather than flat painted lines.
+for(let s of [-1,1]){let m=compose(translate(s*.24,1.48,.40),rz(s*.24),scale(.19,.42,.084));part('fabric','box',m,shade.map(q=>q*.65));
+}
+tailorDetails(seed,part,b,cy,sp,shade);
+// bronze badge & hat emblem
+sp('gold',-.19,1.51,.46,.074,.076,.035,[1.1,.94,.77]);
+let mesh=Object.entries(bags).map(([ma,ge])=>({mesh:makeMesh(ge),ma,model:ident(),skin:false,shadow:true}));
+// Arm geometry is skinned across an elbow, with linear blend skinning for smooth joint transitions.
+function sleeve(s){let b=meshBuilder(),sx=s*.535,z=-.03,ys=[1.67,1.59,1.47,1.36,1.29,1.18,1.06,.96,.88],rs=[.21,.23,.20,.18,.155,.147,.12,.11,.095];for(let j=0;j<ys.length-1;j++){for(let i=0;i<12;i++){let u=i/12,u2=(i+1)/12,angle=u*TAU,angle2=u2*TAU;let p=(jj,aa,uv)=>{let xx=sx+Math.cos(aa)*rs[jj],zz=z+Math.sin(aa)*rs[jj];let k=(1.30-ys[jj])/.20,k2=clamp(k,0,1);return vert(b,[xx,ys[jj],zz],norm([Math.cos(aa),.15,Math.sin(aa)]),uv,shade,[s>0?0:2,s>0?1:3,0,0],[1-k2,k2,0,0]);};let a=p(j,angle,[u,j/8]),bb=p(j,angle2,[u2,j/8]),c=p(j+1,angle2,[u2,(j+1)/8]),d=p(j+1,angle,[u,(j+1)/8]);tri(b,a,bb,c);tri(b,a,c,d);}}
+return makeMesh(b);}
+let sleeves=[{mesh:sleeve(1),ma:'fabric',model:ident(),skin:true,shadow:true},{mesh:sleeve(-1),ma:'fabric',model:ident(),skin:true,shadow:true}];
+const hands=[sp];return{body:mesh,sleeves,style:seed};}
+const characters=[0,1,2,3,4].map(buildPerson),player=buildPerson(4);
+function gunModel(){let bags={};const add=(ma,geo,m,tint)=>addPart(bags,ma,geo,m,tint);const b=(ma,x,y,z,w,h,d,tint)=>add(ma,'box',compose(translate(x,y,z),scale(w,h,d)),tint);const cyl=(ma,x,y,z,r1,r2,h,rot=ident(),tint)=>add(ma,cylGeom(r1,r2,h,32),compose(translate(x,y,z),rot),tint);
+// Colt-style six-shooter, cylinder with chambers, barrel rib, trigger guard and wood grip.
+cyl('steel',0,.07,.53,.078,.082,.91,rx(PI/2),[.92,.88,.82]);
+for(let i=0;i<8;i++){let z=.17+i*.090;b('gold',.090,.094,z,.009,.010,.048,[.68,.55,.34]);}cyl('black',0,.07,.99,.09,.09,.06,rx(PI/2));cyl('steel',0,.095,.09,.155,.155,.30,rx(PI/2),[.91,.87,.82]);for(let i=0;i<6;i++){let a=TAU*i/6;cyl('iron',Math.cos(a)*.085+.01,.095+Math.sin(a)*.085,.26,.023,.023,.037,rx(PI/2),[.54,.55,.56]);}
+b('steel',0,.155,.44,.20,.052,.97,[.84,.84,.83]);b('iron',0,.02,-.16,.19,.25,.47);b('gold',0,-.21,-.26,.16,.065,.25);b('leather',0,-.32,-.31,.20,.33,.16,[.72,.54,.38]);b('black',0,-.43,-.38,.11,.08,.09);b('gold',0,-.08,-.19,.17,.025,.22);b('black',0,.24,.76,.08,.09,.07);b('black',0,.26,-.02,.065,.10,.08);
+
+ // Individual cylinder flutes, screws, sight bead, trigger ring and grip chequering.
+ for(let i=0;i<6;i++){let a=TAU*i/6;
+  b('iron',Math.cos(a)*.112,.095+Math.sin(a)*.112,.165,.020,.015,.13,[.61,.63,.64]);
+  b('gold',Math.cos(a)*.139,.095+Math.sin(a)*.139,.070,.020,.020,.01,[.74,.64,.47]);
+ }
+ b('gold',0,.200,.86,.026,.033,.027,[1.01,.84,.57]);
+ b('steel',0,.185,-.13,.088,.132,.075,[.90,.88,.84]);
+ cyl('gold',0,-.120,-.18,.098,.10,.022,rx(PI/2),[.84,.72,.55]);
+ for(let i=0;i<9;i++)for(let side of [-1,1]){
+  b('darkwood',side*.096,-.20-i*.025,-.25+i*.006,.012,.015,.055,[.72,.63,.47]);
+ }
+
+return Object.entries(bags).map(([ma,ge])=>({mesh:makeMesh(ge),ma,model:ident(),skin:false,shadow:true}));}
+const revolver=gunModel();
+// animated dust motes suspended in the street
+let dustPos=[],dustSize=[];for(let i=0;i<310;i++){dustPos.push((random()-.5)*14,random()*3.4,random()*42-30);dustSize.push(.8+random()*2.4);}const dustVAO=gl.createVertexArray();gl.bindVertexArray(dustVAO);function attrib(arr,loc,size){let buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(arr),gl.STATIC_DRAW);gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,size,gl.FLOAT,false,0,0);}attrib(dustPos,0,3);attrib(dustSize,1,1);gl.bindVertexArray(null);
+// shadow map
+const shadowSize=1536,shadowMap=gl.createTexture();gl.bindTexture(gl.TEXTURE_2D,shadowMap);gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT24,shadowSize,shadowSize,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_INT,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_COMPARE_MODE,gl.COMPARE_REF_TO_TEXTURE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_COMPARE_FUNC,gl.LEQUAL);let shadowFB=gl.createFramebuffer();gl.bindFramebuffer(gl.FRAMEBUFFER,shadowFB);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,shadowMap,0);gl.drawBuffers([gl.NONE]);gl.readBuffer(gl.NONE);if(gl.checkFramebufferStatus(gl.FRAMEBUFFER)!==gl.FRAMEBUFFER_COMPLETE)console.warn('Shadow framebuffer incomplete');gl.bindFramebuffer(gl.FRAMEBUFFER,null);
+const sunDir=norm([.74,1.15,-.85]);const sunView=lookAt([26,39,5],[0,0,-8]);const sunViewProj=mul(ortho(-39,39,-32,33,.5,130),sunView);
+const enemies=[{name:'Coyote Jack',town:'MERCY CREEK',reward:150,speed:1950,style:0},{name:'Red-Hand Rose',town:'DUSTWATER',reward:250,speed:1660,style:1},{name:'Silas Vane',town:'BROKEN SPUR',reward:400,speed:1360,style:2},{name:'The Widowmaker',town:'DEADWOOD JUNCTION',reward:650,speed:1140,style:3},{name:'Marshal Crow',town:'PERDITION',reward:1050,speed:970,style:4}];
+const game={mode:'menu',view:'third',muted:false,round:0,score:0,duelStart:0,signalAt:0,drawAt:0,enemyFiredAt:0,shotAt:0,shot:'',reaction:0,won:false,award:0,enemyFall:0,playerFall:0,drawPose:0,enemyPose:0,paused:false,freezeTime:0,pauseStarted:0,totalPaused:0,aimX:window.innerWidth*.52,aimY:window.innerHeight*.51,randomDelay:0,recoil:0,hitFx:0,showSignal:false,now:0,showHelp:false,frame:0,quality:.85};
+const now=()=>performance.now();let audio=null;
+function soundStart(){try{if(!audio)audio=new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume();}catch(e){}}
+function tone(freq=700,dur=.1,type='triangle',gain=.1,at=0){if(game.muted||!audio)return;let o=audio.createOscillator(),g=audio.createGain();o.type=type;o.frequency.setValueAtTime(freq,audio.currentTime+at);g.gain.setValueAtTime(gain,audio.currentTime+at);g.gain.exponentialRampToValueAtTime(.0001,audio.currentTime+at+dur);o.connect(g).connect(audio.destination);o.start(audio.currentTime+at);o.stop(audio.currentTime+at+dur+.005);}
+function gunSound(){if(game.muted||!audio)return;let dur=.41,buf=audio.createBuffer(1,Math.floor(audio.sampleRate*dur),audio.sampleRate),a=buf.getChannelData(0);for(let i=0;i<a.length;i++){let t=i/audio.sampleRate;a[i]=(Math.random()*2-1)*(Math.exp(-t*21)+.32*Math.exp(-t*4))*Math.sin(t*22*PI)*.9;}let s=audio.createBufferSource(),f=audio.createBiquadFilter(),g=audio.createGain();f.type='lowpass';f.frequency.value=3400;g.gain.value=.65;s.buffer=buf;s.connect(f).connect(g).connect(audio.destination);s.start();tone(103,.22,'sawtooth',.15);}
+function bell(){tone(970,.22,'sine',.19);tone(1450,.36,'triangle',.09,.06);tone(1980,.32,'sine',.035,.08);}
+function setText(id,v){$(id).textContent=v;}
+function banner(pre,main,sub){setText('bannerPre',pre);setText('bannerMain',main);setText('bannerSub',sub);$('banner').classList.add('shown');}
+function hideBanner(){$('banner').classList.remove('shown');}
+function showHud(v){$('hud').classList.toggle('hidden',!v);}
+function flash(strength=1){let f=$('flash');f.style.transition='none';f.style.opacity=String(.65*strength);requestAnimationFrame(()=>{f.style.transition='opacity .24s ease-out';f.style.opacity='0';});}
+function resetRound(keepScore=true){game.mode='introDuel';game.duelStart=now();game.signalAt=game.duelStart+3050+random()*1500;game.drawAt=0;game.shotAt=0;game.enemyFiredAt=0;game.shot='';game.won=false;game.award=0;game.reaction=0;game.drawPose=0;game.enemyPose=0;game.enemyFall=0;game.playerFall=0;game.recoil=0;game.hitFx=0;game.showSignal=false;game.totalPaused=0;game.paused=false;game.aimX=window.innerWidth*.5;game.aimY=window.innerHeight*.5;$('result').classList.remove('shown');$('pause').classList.remove('show');$('blood').style.opacity='0';$('reticle').classList.remove('live','hot');hideBanner();let e=enemies[game.round];setText('roundText',String(game.round+1).padStart(2,'0')+' / 05');setText('enemyText',e.name.toUpperCase());setText('rewardText','$ '+e.reward+' REWARD');setText('scoreText','$'+game.score.toLocaleString());setText('hintTitle','KEEP YOUR HAND AWAY FROM THE IRON');setText('hintText','MOVE MOUSE TO AIM · CLICK TO FIRE · V TO CHANGE VIEW');showHud(true);}
+function startGame(){soundStart();game.round=0;game.score=0;$('intro').classList.add('hidden');resetRound();}
+function finishRound(win,type='BODY',reason=''){if(game.mode==='won'||game.mode==='lost')return;game.mode=win?'won':'lost';game.won=win;game.shot=type;game.shotAt=game.now;game.enemyFall=win?0:game.enemyFall;game.playerFall=win?0:0;game.award=win?enemies[game.round].reward+(type==='HEADSHOT'?100:0):0;if(win){game.score+=game.award;tone(690,.2,'triangle',.09,.2);tone(910,.45,'sine',.08,.36);}else{$('blood').style.opacity='.88';tone(110,.45,'sawtooth',.06,.1);}setText('scoreText','$'+game.score.toLocaleString());setText('hintTitle',win?'BURIED BEFORE SUNDOWN':'DEAD ON THE MAIN STREET');hideBanner();setTimeout(()=>{if(game.mode!==(win?'won':'lost'))return;setText('resultPre',win?'DUEL WON · '+enemies[game.round].town:'DUEL LOST · '+enemies[game.round].town);setText('resultTitle',win?(game.round===4?'LEGEND OF THE FRONTIER':'THE FASTEST GUN'):(reason==='FALSE START'?'TOO QUICK ON THE TRIGGER':'DUST TO DUST'));setText('resultDesc',win?(type==='HEADSHOT'?'A clean shot. The outlaw never saw it coming.':'Your iron was the last word on Main Street.'):(reason==='FALSE START'?'You drew before the bell. The law calls it cheating.':'Your opponent drew faster. Another name for the undertaker.'));setText('timeStat',game.reaction? (game.reaction/1000).toFixed(3)+'s':'—');setText('shotStat',win?type:reason==='FALSE START'?'FOUL':'MISSED');setText('bountyStat',win?'+$'+game.award:'$0');setText('nextBtn',game.round===4&&win?'PLAY AGAIN →':'NEXT DUEL →');$('nextBtn').style.display=win?'inline-block':'none';$('retryBtn').textContent=win?'REPLAY DUEL ↻':'RETRY ↻';$('result').classList.add('shown');},win?900:750);}
+function cameraToggle(){game.view=game.view==='third'?'first':'third';$('cameraBtn').textContent=game.view==='third'?'◈ THIRD PERSON':'◉ FIRST PERSON';tone(280,.09,'triangle',.05);}
+function pauseToggle(){if(['menu','won','lost'].includes(game.mode))return;game.paused=!game.paused;if(game.paused){game.pauseStarted=now();$('pause').classList.add('show');}else{let elapsed=now()-game.pauseStarted;game.totalPaused+=elapsed;game.duelStart+=elapsed;game.signalAt+=elapsed;if(game.drawAt)game.drawAt+=elapsed;if(game.enemyFiredAt)game.enemyFiredAt+=elapsed;$('pause').classList.remove('show');}}
+function screenToRay(x,y){let nx=x/window.innerWidth*2-1,ny=1-y/window.innerHeight*2;let cam=currentCamera;let forward=norm(sub(cam.target,cam.eye)),right=norm(cross(forward,[0,1,0])),up=cross(right,forward),t=Math.tan(cam.fov/2);return{origin:cam.eye,dir:norm(add(add(forward,right.map(v=>v*nx*t*cam.aspect)),up.map(v=>v*ny*t)))};}
+function raySphere(o,d,c,r){let to=sub(o,c),bb=dot(to,d),cc=dot(to,to)-r*r,delta=bb*bb-cc;return delta>=0&&(-bb-Math.sqrt(delta)>0||-bb+Math.sqrt(delta)>0);}
+function aimResult(x,y){let ray=screenToRay(x,y),enemyX=.0,enemyZ=-8.9,fallen=game.enemyFall>.5;if(fallen)return'';if(raySphere(ray.origin,ray.dir,[enemyX,2.30,enemyZ],.32))return'HEADSHOT';if(raySphere(ray.origin,ray.dir,[enemyX,1.36,enemyZ],.62))return'BODY';if(raySphere(ray.origin,ray.dir,[enemyX, .60,enemyZ],.44))return'BODY';return'';}
+function fire(){if(game.paused||['menu','won','lost'].includes(game.mode))return;soundStart();if(game.mode==='introDuel'||game.mode==='waiting'){game.reaction=0;game.drawPose=1;gunSound();flash(.7);finishRound(false,'','FALSE START');return;}if(game.mode!=='draw')return;game.mode='fired';game.shotAt=game.now;game.reaction=Math.max(0,game.now-game.drawAt);game.drawPose=.18;game.recoil=1;gunSound();flash();let hit=aimResult(game.aimX,game.aimY);if(hit){game.hitFx=1;finishRound(true,hit);}else{setText('hintTitle','YOU MISSED YOUR ONLY SHOT');setText('hintText','THE OUTLAW IS DRAWING...');}}
+canvas.addEventListener('pointermove',e=>{game.aimX=e.clientX;game.aimY=e.clientY;});
+canvas.addEventListener('pointerdown',e=>{if(e.button===0)fire();});
+$('startBtn').onclick=startGame;$('howBtn').onclick=()=>{alert('Wait until the bell rings and DRAW appears. Tap the ✦ ULTRA graphics button to toggle performance mode. Move your mouse to aim at the outlaw, then left-click once to shoot. Headshots earn a bonus. A false start loses the duel. V changes between first- and third-person, H toggles Ultra graphics, P pauses, M toggles sound.');};
+$('cameraBtn').onclick=cameraToggle;$('soundBtn').onclick=()=>{game.muted=!game.muted;$('soundBtn').textContent=game.muted?'♪ SOUND OFF':'♫ SOUND ON';if(!game.muted)soundStart();};$('pauseBtn').onclick=pauseToggle;$('resumeBtn').onclick=pauseToggle;
+$('nextBtn').onclick=()=>{if(game.round===4){game.round=0;game.score=0;}else game.round++;resetRound();};$('retryBtn').onclick=()=>{if(game.won)game.score-=game.award;resetRound();};
+window.addEventListener('keydown',e=>{if(e.key.toLowerCase()==='v'){cameraToggle();}if(e.key.toLowerCase()==='p'||e.key==='Escape'){pauseToggle();}if(e.key.toLowerCase()==='m')$('soundBtn').click();if(e.key.toLowerCase()==='h')$('qualityBtn').click();if(e.key==='Enter'){if(!$('intro').classList.contains('hidden'))startGame();else if($('result').classList.contains('shown')){if(game.won)$('nextBtn').click();else $('retryBtn').click();}}if(e.code==='Space'){e.preventDefault();if(game.mode==='draw')fire();}});
+const compositeFS=`#version 300 es
+precision highp float;in vec2 uv;out vec4 o;uniform sampler2D uColor,uDepth;
+uniform vec2 uInvResolution;uniform float uTime,uHit,uQuality;
+float luma(vec3 c){return dot(c,vec3(.2126,.7152,.0722));}
+void main(){vec2 p=uv;float aberr=.00055+.0023*uHit;vec2 ab=vec2(aberr,0.);
+vec3 base=vec3(texture(uColor,p+ab).r,texture(uColor,p).g,texture(uColor,p-ab).b);
+vec3 bloom=vec3(0.);float tot=.001;
+for(int i=0;i<8;i++){float a=float(i)*.785398;vec2 dir=vec2(cos(a),sin(a));
+vec2 u=dir*uInvResolution*(4.5+uQuality*2.5);
+vec3 s=texture(uColor,p+u).rgb;
+float bright=smoothstep(.59,.93,luma(s));bloom+=s*bright;tot+=bright;}
+bloom/=max(8.,tot);
+base+=bloom*(.13+.04*uQuality);
+float depth=texture(uDepth,p).r;float focus=1.-smoothstep(.999,.99994,depth);
+float vign=1.-.28*smoothstep(.12,.68,length((p-.5)*vec2(1.18,1.0)));
+base*=vign;float film=fract(sin(dot(floor(p*vec2(1800.,1100.))+uTime*121.6,vec2(12.9898,78.233)))*43758.5453)-.5;
+base+=(film*.020)*(1.-.5*focus);
+base=clamp((base-.5)*1.082+.5,0.,1.);
+base*=vec3(1.035,1.,.956);
+o=vec4(base,1.);}`;
+const compositeProgram=program(skyVS,compositeFS);
+const CU={uColor:gl.getUniformLocation(compositeProgram,'uColor'),uDepth:gl.getUniformLocation(compositeProgram,'uDepth'),uInvResolution:gl.getUniformLocation(compositeProgram,'uInvResolution'),uTime:gl.getUniformLocation(compositeProgram,'uTime'),uHit:gl.getUniformLocation(compositeProgram,'uHit'),uQuality:gl.getUniformLocation(compositeProgram,'uQuality')};
+let renderFB=gl.createFramebuffer(),renderColor=gl.createTexture(),renderDepth=gl.createTexture();
+function allocatePost(w,h){gl.bindTexture(gl.TEXTURE_2D,renderColor);gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA8,w,h,0,gl.RGBA,gl.UNSIGNED_BYTE,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+gl.bindTexture(gl.TEXTURE_2D,renderDepth);gl.texImage2D(gl.TEXTURE_2D,0,gl.DEPTH_COMPONENT24,w,h,0,gl.DEPTH_COMPONENT,gl.UNSIGNED_INT,null);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.NEAREST);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE);
+gl.bindFramebuffer(gl.FRAMEBUFFER,renderFB);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,renderColor,0);gl.framebufferTexture2D(gl.FRAMEBUFFER,gl.DEPTH_ATTACHMENT,gl.TEXTURE_2D,renderDepth,0);gl.drawBuffers([gl.COLOR_ATTACHMENT0]);const ok=gl.checkFramebufferStatus(gl.FRAMEBUFFER)===gl.FRAMEBUFFER_COMPLETE;gl.bindFramebuffer(gl.FRAMEBUFFER,null);return ok;}
+let postActive=false,cinemaUltra=true;
+function finalComposite(tm){if(!postActive)return;gl.bindFramebuffer(gl.FRAMEBUFFER,postActive?renderFB:null);gl.viewport(0,0,width,height);gl.disable(gl.DEPTH_TEST);gl.disable(gl.BLEND);gl.disable(gl.CULL_FACE);gl.useProgram(compositeProgram);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,renderColor);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,renderDepth);gl.uniform1i(CU.uColor,0);gl.uniform1i(CU.uDepth,1);gl.uniform2f(CU.uInvResolution,1/width,1/height);gl.uniform1f(CU.uTime,tm*.001);gl.uniform1f(CU.uHit,game.recoil);gl.uniform1f(CU.uQuality,cinemaUltra?1:0);gl.bindVertexArray(null);gl.drawArrays(gl.TRIANGLES,0,3);}
+
+let width=0,height=0,dpr=1,currentCamera=null;
+function resize(){let wd=window.innerWidth,ht=window.innerHeight;dpr=Math.min(window.devicePixelRatio||1,cinemaUltra?2:1.3);let maxPix=cinemaUltra?3000000:1400000;let fact=Math.min(1,Math.sqrt(maxPix/(wd*ht*dpr*dpr)));width=Math.floor(wd*dpr*fact);height=Math.floor(ht*dpr*fact);canvas.width=width;canvas.height=height;gl.viewport(0,0,width,height);postActive=allocatePost(width,height);}window.addEventListener('resize',resize);resize();
+$('qualityBtn').onclick=()=>{cinemaUltra=!cinemaUltra;$('qualityBtn').textContent=cinemaUltra?'✦ ULTRA':'✧ BALANCED';resize();};
+function moveCamera(tm){let snap=game.view==='first',main=game.mode==='menu',t=tm*.001;let shot=game.mode==='won'||game.mode==='lost';let steady=shot?0:1;let shake=game.recoil*.065;let dx=(game.aimX/window.innerWidth-.5),dy=(game.aimY/window.innerHeight-.5);let pos,look,fov;
+if(main){pos=[1.42+Math.sin(t*.15)*.35,2.32,-.6+Math.cos(t*.22)*.25];look=[0,1.36,-9.0];fov=53;}
+else if(game.mode==='introDuel'){let age=tm-game.duelStart;if(age<520){pos=[1.05,2.26,-6.98];look=[0,2.22,-8.85];fov=39;}else{pos=[1.48,1.52,-6.83];look=[.35,1.02,-8.83];fov=46;}}
+else if(snap){pos=[.0,1.84,2.64];look=[dx*.8,1.72+dy*.44,-9.2];fov=49;}
+else{pos=[1.03,2.47,5.88];look=[dx*.36,1.63+dy*.22,-8.7];fov=49;}
+let cinematic=main?.0:game.mode==='introDuel'?.18:0;if(shot){fov=43;pos[0]+=(game.mode==='won'?.24:-.16);pos[1]+=.08;}pos[0]+=Math.sin(t*.65)*.009;pos[1]+=Math.sin(t*1.1)*.011+(random()-.5)*shake;pos[2]+=Math.sin(t*.7)*.009;if(game.mode==='draw')fov-=1.8;
+let c={eye:pos,target:look,fov:fov*PI/180,aspect:width/height};c.view=lookAt(pos,look);c.proj=perspective(c.fov,c.aspect,.08,430);c.vp=mul(c.proj,c.view);return c;}
+// Six hand-authored anatomical poses with eased interpolation; these are NOT motion-capture recordings.
+const DRAW_POSES=[{t:0,shoulder:0,elbow:0,twist:0},{t:.13,shoulder:-.10,elbow:-.08,twist:.06},
+{t:.29,shoulder:.22,elbow:.24,twist:.13},{t:.48,shoulder:.79,elbow:.68,twist:.20},
+{t:.73,shoulder:1.29,elbow:.92,twist:.24},{t:1,shoulder:1.46,elbow:.60,twist:.08}];
+function samplePose(t){t=clamp(t,0,1);for(let i=0;i<DRAW_POSES.length-1;i++){let a=DRAW_POSES[i],b=DRAW_POSES[i+1];if(t<=b.t){let f=smooth((t-a.t)/(b.t-a.t));return{shoulder:a.shoulder+(b.shoulder-a.shoulder)*f,elbow:a.elbow+(b.elbow-a.elbow)*f,twist:a.twist+(b.twist-a.twist)*f};}}return DRAW_POSES[DRAW_POSES.length-1];}
+function charBones(draw,side=1,fall=0){let p=clamp(draw,0,1),pose=samplePose(p);
+const anticipation=game.mode==='waiting'?(Math.sin(game.now*.0011)*.019):0;let mats=[];
+for(let s of [1,-1]){let sx=.535*s,shoulder=1.57,acting=s===side;
+let roll=acting?pose.shoulder+anticipation:.035*Math.sin(game.now*.0025+s);
+let M=compose(translate(sx,shoulder,-.03),rx(-roll),rz((acting?-.17:.06)*s),translate(-sx,-shoulder,.03));
+let fore=compose(translate(sx,shoulder,-.03),rx(-roll),rz((acting?-.17:.06)*s),translate(0,-.35,0),rx(acting?-pose.elbow:0),rz(acting?pose.twist*s:0),translate(0,.35,0),translate(-sx,-shoulder,.03));mats.push(M,fore);}while(mats.length<8)mats.push(ident());return mats;}
+function characterRoot(z,playerFlag=false,fall=0){let drift=Math.sin(game.now*.0012)*.015;let tension=game.mode==='waiting'?Math.sin(game.now*.0031)*.008:0;if(playerFlag){let angle=-PI;let roll=(fall||0)*-1.25;return compose(translate(0,0,z),ry(angle),rz(roll));}return compose(translate(0,-Math.sin(fall*PI*.5)*.35+Math.sin(game.now*.0021)*.009,z),rz(-fall*1.47),ry(-.07+drift));}
+const gunHandLocal=[.53,.93,.035];
+function handTransform(root,bones,p,side=1){let pt=tx(bones[1],gunHandLocal);return compose(root,translate(pt[0],pt[1],pt[2]+.12),rx(-p*1.22),rz(.12),scale(.78,.78,.78));}
+function drawGroup(list,model,skin,bones){for(let obj of list){drawItem({...obj,model,skin:skin||obj.skin},bones);}}
+function drawItem(item,bones){let ma=material[item.ma]||material.wood;gl.uniformMatrix4fv(U.scene.uModel,false,item.model);gl.uniform1i(U.scene.uSkin,item.skin?1:0);if(item.skin&&bones){let data=new Float32Array(128);for(let i=0;i<8;i++)data.set(bones[i]||ident(),i*16);gl.uniformMatrix4fv(U.scene.uBones,false,data);}gl.uniform1f(U.scene.uMetalness,ma.metal);gl.uniform1f(U.scene.uRoughness,ma.rough);gl.uniform1f(U.scene.uLight,ma.light);gl.uniform3fv(U.scene.uTint,ma.tint);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,ma.tex);gl.activeTexture(gl.TEXTURE2);gl.bindTexture(gl.TEXTURE_2D,ma.nrTex||flatNormal);gl.uniform1i(U.scene.uWorldUV,item.ma==='sand'?1:0);gl.bindVertexArray(item.mesh.vao);gl.drawElements(gl.TRIANGLES,item.mesh.count,gl.UNSIGNED_INT,0);}
+function drawShadowItem(item,bones){gl.uniformMatrix4fv(U.shadow.uModel,false,item.model);gl.uniform1i(U.shadow.uSkin,item.skin?1:0);if(item.skin&&bones){let data=new Float32Array(128);for(let i=0;i<8;i++)data.set(bones[i]||ident(),i*16);gl.uniformMatrix4fv(U.shadow.uBones,false,data);}gl.bindVertexArray(item.mesh.vao);gl.drawElements(gl.TRIANGLES,item.mesh.count,gl.UNSIGNED_INT,0);}
+function gunMatrixFirst(cam,pose,recoil){let f=norm(sub(cam.target,cam.eye)),right=norm(cross(f,[0,1,0])),up=cross(right,f),p=smooth(clamp(pose,0,1));let xyz=add(add(add(cam.eye,right.map(v=>v*(.65-p*.12))),up.map(v=>v*(-.58+p*.23))),f.map(v=>v*(.93+p*.18-recoil*.24))); // gun barrel points along camera forward
+let yaw=Math.atan2(f[0],f[2]);let pitch=-Math.asin(f[1]);return compose(translate(...xyz),ry(yaw),rx(pitch+.08),rz(-.2+p*.10),scale(.78,.78,.78));}
+
+// Small real-time 3D muzzle flame and smoke geometry, rather than a 2D full-screen overlay alone.
+function makeMuzzle(){
+ let flames=meshBuilder();let pr=cylGeom(.064,.005,.45,14);
+ append(flames,pr,compose(translate(0,.05,.0),rx(PI/2)));
+ for(let i=0;i<6;i++){
+  let a=i*TAU/6;let mm=compose(translate(Math.cos(a)*.07,.055+Math.sin(a)*.07,.10),ry(a),rx(PI/2),scale(.33,.66,.36));
+  append(flames,pr,mm,[1.2,.84,.47]);
+ }
+ return makeMesh(flames);
+}
+const muzzleMesh=makeMuzzle();
+material.muzzle={tex:textures.gold,nrTex:flatNormal,metal:0,rough:.8,tint:[2.2,1.43,.50],light:4};
+
+function drawSceneObjects(shadows){let enemyRoot=characterRoot(-8.9,false,game.enemyFall),pRoot=characterRoot(2.57,true,game.playerFall),enemyRig=characters[enemies[game.round].style],eBones=charBones(game.enemyPose),pBones=charBones(game.drawPose),menu=game.mode==='menu';
+const shadowItem=(obj,bones)=>drawShadowItem(obj,bones),regularItem=(obj,bones)=>drawItem(obj,bones),draw=shadows?shadowItem:regularItem;
+for(let obj of staticMeshes){if(shadows&&!obj.shadow)continue;draw(obj);}
+let people=[{rig:enemyRig,root:enemyRoot,bones:eBones,p:game.enemyPose,player:false},{rig:player,root:pRoot,bones:pBones,p:game.drawPose,player:true}];
+for(let person of people){if(person.player&&game.view==='first'&&!menu)continue;for(let obj of person.rig.body)draw({...obj,model:person.root});for(let obj of person.rig.sleeves)draw({...obj,model:person.root,skin:true},person.bones);let gunRoot=handTransform(person.root,person.bones,person.p);for(let obj of revolver)draw({...obj,model:gunRoot});
+// glove at hand: draws as true 3D sphere primitive rather than a flat sprite
+handsAt(person,person.bones,draw);}
+if(game.view==='first'&&!menu){let root=gunMatrixFirst(currentCamera,game.drawPose,game.recoil);for(let obj of revolver)draw({...obj,model:root});let glove=compose(root,translate(0,-.38,-.21),rx(-.58),scale(1.11,1.2,1.08));draw({mesh:detailedHandMesh,ma:'leather',model:glove,skin:false});let sleeve=compose(root,translate(0,-.64,-.20),scale(.22,.36,.20));draw({mesh:handMesh,ma:'fabric',model:sleeve,skin:false});}
+ if(!shadows&&game.shotAt&&game.now-game.shotAt<125&&game.mode!=='lost'){
+  let root=(game.view==='first'&&!menu)?gunMatrixFirst(currentCamera,game.drawPose,game.recoil):handTransform(pRoot,pBones,game.drawPose);
+  draw({mesh:muzzleMesh,ma:'muzzle',model:mul(root,translate(0,.07,1.06)),skin:false});
+ }
+ }
+
+function buildHandMesh(){
+ let ge=meshBuilder();
+ function put(geo,M){append(ge,geo,M);}
+ put(hiSphere,compose(translate(0,.005,0),scale(.115,.102,.075)));
+ for(let i=0;i<4;i++){
+  let x=(i-1.5)*.045,len=[.113,.143,.133,.106][i];
+  put(cylGeom(.022,.016,len,12),compose(translate(x,-.076-len*.22,.026),rz((1.5-i)*.095)));
+  put(sphereGeom(1,8,10),compose(translate(x,-.085-len*.67,.027),scale(.020,.025,.023)));
+ }
+ put(cylGeom(.031,.018,.135,12),compose(translate(-.122,-.034,.025),rz(-.78)));
+ return makeMesh(ge);
+}
+const detailedHandMesh=buildHandMesh();
+function handsAt(person,bones,draw){
+ for(let s of [1,-1]){
+  let idx=s===1?1:3,pt=tx(bones[idx],[s*.535,.93,.035]);
+  let grip=person.p>.12&&s===1;
+  let M=compose(person.root,translate(...pt),rx(grip?-.23:0),rz(s*.08),scale(.94,.97,.94));
+  draw({mesh:detailedHandMesh,ma:person.player?'leather':'skin',model:M,skin:false});
+ }
+}
+
+const handMesh=makeMesh(primitives.sphere);
+function drawFrame(tm){game.now=tm;if(!game.paused){let dt=Math.min(60,tm-(game.lastFrame||tm));game.lastFrame=tm;let isGameplay=['introDuel','waiting','draw','fired'].includes(game.mode);if(game.mode==='introDuel'&&tm-game.duelStart>900){game.mode='waiting';banner('FACE YOUR MAKER',enemies[game.round].name.toUpperCase(),'WAIT FOR THE BELL');}if(game.mode==='waiting'&&tm>game.signalAt){game.mode='draw';game.drawAt=tm;game.enemyFiredAt=tm+enemies[game.round].speed+random()*220-110;game.showSignal=true;banner('NOW OR NEVER','DRAW!','ONE SHOT. ONE CHANCE.');bell();setText('hintTitle','DRAW YOUR IRON!');setText('hintText','AIM AT THE OUTLAW · FIRE ONCE');$('reticle').classList.add('live');}
+if(game.mode==='draw'&&tm-game.drawAt>650)hideBanner();if(['draw','fired'].includes(game.mode)){let t=(tm-game.drawAt)/400;game.enemyPose=Math.min(1,Math.max(0,t)*.88);if(tm>game.enemyFiredAt&&game.mode!=='won'&&game.mode!=='lost'){game.enemyPose=1;gunSound();flash(.35);finishRound(false,'','OUTDRAWN');}}
+if(game.mode==='won')game.enemyFall=clamp(game.enemyFall+dt*.00128,0,1);if(game.mode==='lost')game.playerFall=clamp(game.playerFall+dt*.0013,0,1);game.drawPose=game.mode==='fired'||game.mode==='won'?Math.min(1,game.drawPose+dt*.009):game.drawPose;game.recoil*=Math.pow(.83,dt/16.7);game.hitFx*=Math.pow(.9,dt/16.7);
+if(game.mode==='waiting'&&tm>game.duelStart+1520)hideBanner();if(isGameplay)$('reticle').classList.toggle('hot',game.mode==='draw'&&!!aimResult(game.aimX,game.aimY));}
+currentCamera=moveCamera(tm);let sun=norm([.74,1.15,-.85]);
+// shadow pass (directional shadow-map)
+gl.bindFramebuffer(gl.FRAMEBUFFER,shadowFB);gl.viewport(0,0,shadowSize,shadowSize);gl.enable(gl.DEPTH_TEST);gl.depthMask(true);gl.clearDepth(1);gl.clear(gl.DEPTH_BUFFER_BIT);gl.enable(gl.CULL_FACE);gl.cullFace(gl.BACK);gl.useProgram(shadowProgram);gl.uniformMatrix4fv(U.shadow.uSunViewProj,false,sunViewProj);drawSceneObjects(true);
+// sky pass
+gl.bindFramebuffer(gl.FRAMEBUFFER,postActive?renderFB:null);gl.viewport(0,0,width,height);gl.disable(gl.DEPTH_TEST);gl.disable(gl.CULL_FACE);gl.depthMask(false);gl.useProgram(skyProgram);gl.uniform1f(U.sky.uTime,tm*.001);gl.uniform1f(U.sky.uAspect,width/height);gl.uniform3fv(U.sky.uSkyTop,[.20,.30,.45]);gl.uniform3fv(U.sky.uSkyLow,[.86,.53,.32]);gl.bindVertexArray(null);gl.drawArrays(gl.TRIANGLES,0,3);
+// world PBR pass
+gl.enable(gl.DEPTH_TEST);gl.enable(gl.CULL_FACE);gl.depthMask(true);gl.clear(gl.DEPTH_BUFFER_BIT);gl.useProgram(sceneProgram);gl.uniformMatrix4fv(U.scene.uViewProj,false,currentCamera.vp);gl.uniformMatrix4fv(U.scene.uSunViewProj,false,sunViewProj);gl.uniform3fv(U.scene.uCamera,currentCamera.eye);gl.uniform3fv(U.scene.uSunDir,sun);gl.uniform3fv(U.scene.uFogColor,[.86,.53,.35]);gl.uniform1f(U.scene.uFogDensity,.011);gl.uniform1f(U.scene.uTime,tm*.001);gl.uniform1i(U.scene.uShadowEnabled,1);gl.uniform1i(U.scene.uTex,0);gl.uniform1i(U.scene.uNormalRough,2);gl.uniform1i(U.scene.uShadow,1);gl.activeTexture(gl.TEXTURE1);gl.bindTexture(gl.TEXTURE_2D,shadowMap);drawSceneObjects(false);
+// floating dust particles
+gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);gl.useProgram(particleProgram);gl.uniformMatrix4fv(U.particle.uViewProj,false,currentCamera.vp);gl.uniform1f(U.particle.uTime,tm*.001);gl.bindVertexArray(dustVAO);gl.drawArrays(gl.POINTS,0,dustSize.length);gl.disable(gl.BLEND);gl.depthMask(true);gl.bindVertexArray(null);finalComposite(tm);
+if(game.mode==='draw'||game.mode==='fired'){let ret=$('reticle');ret.style.left=game.aimX+'px';ret.style.top=game.aimY+'px';}game.frame++;requestAnimationFrame(drawFrame);}
+// Catch rendering errors, do not freeze behind the loading screen.
+window.addEventListener('error',e=>console.error('DUST & IRON:',e.message));
+$('loading').classList.add('hidden');requestAnimationFrame(drawFrame);
+</script></body></html>
